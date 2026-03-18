@@ -27,7 +27,8 @@
 
         .tarjeta { background-color: var(--tarjeta); border-radius: 12px; padding: 20px; margin-bottom: 20px; border: 1px solid var(--borde); box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
         
-        select, input { width: 100%; padding: 15px; margin-bottom: 15px; background-color: #2C2C2C; color: var(--texto); border: 1px solid var(--borde); border-radius: 8px; font-size: 16px; }
+        select, input, textarea { width: 100%; padding: 15px; margin-bottom: 15px; background-color: #2C2C2C; color: var(--texto); border: 1px solid var(--borde); border-radius: 8px; font-size: 16px; font-family: inherit; }
+        textarea { resize: vertical; min-height: 80px; }
         
         .btn-principal { width: 100%; padding: 18px; border: none; border-radius: 10px; font-size: 18px; font-weight: bold; color: white; background-color: var(--primario); cursor: pointer; transition: 0.2s; display: flex; justify-content: center; align-items: center; gap: 10px; }
         .btn-principal:active { transform: scale(0.98); opacity: 0.8; }
@@ -40,11 +41,13 @@
         .ejercicio-titulo { font-size: 22px; color: var(--primario); font-weight: bold; margin: 0 0 5px 0; }
         .ejercicio-tipo { font-size: 12px; text-transform: uppercase; background: #333; padding: 4px 10px; border-radius: 12px; display: inline-block; color: #aaa; }
         
-        .grid-datos { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
-        .dato-caja { background: #2C2C2C; padding: 15px; border-radius: 10px; text-align: center; border: 1px solid #444; }
-        .dato-caja span { display: block; font-size: 12px; color: #aaa; text-transform: uppercase; margin-bottom: 5px; }
-        .input-progreso { background: transparent; border: none; color: white; font-size: 28px; font-weight: bold; text-align: center; padding: 0; margin: 0; width: 100%; }
+        .grid-datos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 25px; }
+        .dato-caja { background: #2C2C2C; padding: 10px; border-radius: 10px; text-align: center; border: 1px solid #444; }
+        .dato-caja span { display: block; font-size: 11px; color: #aaa; text-transform: uppercase; margin-bottom: 8px; }
+        
+        .input-progreso { background: transparent; border: none; color: white; font-size: 22px; font-weight: bold; text-align: center; padding: 0; margin: 0; width: 100%; }
         .input-progreso:focus { outline: none; border-bottom: 2px solid var(--primario); }
+        select.input-progreso { appearance: none; -webkit-appearance: none; cursor: pointer; font-size: 16px;}
 
         .progreso-series { display: flex; justify-content: center; gap: 8px; margin-bottom: 25px; flex-wrap: wrap; }
         .bolita-serie { width: 25px; height: 25px; border-radius: 50%; background-color: #333; border: 2px solid #555; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; }
@@ -61,6 +64,7 @@
         .historial-item { border-left: 4px solid var(--exito); background: #252525; padding: 15px; margin-bottom: 10px; border-radius: 0 8px 8px 0; display: flex; justify-content: space-between; align-items: center; }
         .historial-info p { margin: 5px 0 0 0; font-size: 12px; color: #aaa; }
         .historial-volumen { font-size: 15px; font-weight: bold; color: var(--primario); text-align: right; }
+        .historial-nota { font-size: 11px; color: #888; margin-top: 5px; font-style: italic; }
 
         /* --- SELECTOR DE DÍAS Y RUTINA DIARIA --- */
         .dias-selector { display: flex; gap: 8px; overflow-x: auto; margin-bottom: 20px; padding-bottom: 5px; scrollbar-width: none; }
@@ -74,19 +78,24 @@
         .btn-play-chico { width: auto; padding: 10px 20px; font-size: 14px; border-radius: 8px; }
         details summary { padding: 10px; background: #252525; border-radius: 8px; cursor: pointer; font-weight: bold; color: #aaa; border: 1px solid var(--borde); }
 
-        /* --- EDITOR DE RUTINAS --- */
+        /* --- EDITOR Y CALENDARIO --- */
         .lista-editor-item { background: #252525; padding: 12px; border-radius: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border-left: 3px solid var(--primario); }
         .lista-editor-item p { margin: 0 0 4px 0; font-size: 15px; font-weight: bold; }
         .lista-editor-item small { color: #aaa; font-size: 12px; }
         .form-fila { display: flex; gap: 10px; }
         .form-fila input { flex: 1; }
 
-        /* --- CALENDARIO CONSTANCIA --- */
         .calendario-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; text-align: center; margin-bottom: 15px; }
         .dia-cal { background: #252525; padding: 8px 0; border-radius: 6px; font-size: 13px; color: #7f8c8d; }
         .dia-cal.entrenado { background: var(--primario); color: white; font-weight: bold; border: 1px solid #5DADE2; }
         .dia-cal.hoy { border: 2px solid var(--alerta); color: white; }
         .dia-nombre { font-size: 11px; text-transform: uppercase; color: #666; font-weight: bold; margin-bottom: 5px; }
+
+        /* --- MODAL (POPUP) FATIGA --- */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: flex; justify-content: center; align-items: center; z-index: 2000; padding: 20px; backdrop-filter: blur(5px); }
+        .modal-content { background: var(--tarjeta); padding: 25px; border-radius: 16px; width: 100%; max-width: 400px; border: 1px solid var(--borde); box-shadow: 0 10px 25px rgba(0,0,0,0.5); text-align: center; }
+        .btn-emoji { font-size: 30px; background: #2C2C2C; border: 1px solid #444; border-radius: 12px; padding: 15px; flex: 1; cursor: pointer; transition: 0.2s; }
+        .btn-emoji:active { transform: scale(0.9); }
 
         /* --- NAVEGACIÓN INFERIOR --- */
         .navegacion { position: fixed; bottom: 0; left: 0; width: 100%; background-color: var(--tarjeta); box-shadow: 0 -2px 10px rgba(0,0,0,0.5); display: flex; justify-content: space-around; padding: 8px 0 15px 0; z-index: 1000; border-radius: 16px 16px 0 0; border-top: 1px solid var(--borde); }
@@ -96,6 +105,10 @@
         .tab-btn.activo i { filter: grayscale(0%); opacity: 1; transform: scale(1.1); }
 
         .grafico-contenedor { position: relative; height: 250px; width: 100%; margin-top: 20px; }
+        
+        /* SCORE DORADO V-TAPER */
+        .vtaper-card { background: linear-gradient(135deg, #f39c12 0%, #d35400 100%); color: white; padding: 15px; border-radius: 12px; text-align: center; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(243, 156, 18, 0.2); }
+        .vtaper-card strong { font-size: 36px; display: block; margin: 5px 0; }
     </style>
 </head>
 <body>
@@ -138,7 +151,7 @@
             <div id="vistaEditor" class="oculto">
                 <div class="tarjeta">
                     <h2>Modificar Rutina</h2>
-                    <p style="font-size: 12px; color: #aaa; margin-top: -10px; margin-bottom: 15px;">Podés agregar nuevos ejercicios, eliminarlos o cambiar el orden en el que los ejecutás.</p>
+                    <p style="font-size: 12px; color: #aaa; margin-top: -10px; margin-bottom: 15px;">Agregá, eliminá o reordená tus ejercicios.</p>
                     <select id="editorSelectorRutina" onchange="mostrarEjerciciosEditor()"></select>
                     <div id="listaEjerciciosEditor" style="margin-top: 15px;"></div>
                 </div>
@@ -163,6 +176,13 @@
             </div>
 
             <div id="vistaEstadisticas" class="oculto">
+                
+                <div class="vtaper-card">
+                    <span style="font-size: 12px; text-transform: uppercase; font-weight: bold; letter-spacing: 1px;">Tu Ratio V-Taper</span>
+                    <strong id="uiVTaperDisplay">--</strong>
+                    <span style="font-size: 11px;">Objetivo Men's Physique: > 1.6</span>
+                </div>
+
                 <div class="tarjeta">
                     <h2>Constancia (Mes Actual)</h2>
                     <div class="calendario-grid" style="border-bottom: none; margin-bottom: 5px;">
@@ -173,11 +193,32 @@
                 </div>
 
                 <div class="tarjeta">
-                    <h2>Volumen de Carga (Tonelaje)</h2>
+                    <h2>Volumen de Carga Efectiva</h2>
+                    <p style="font-size: 12px; color: #aaa; margin-top: -10px;">Tonelaje. Excluye series de Calentamiento.</p>
                     <div class="grafico-contenedor">
                         <canvas id="chartVolumen"></canvas>
                     </div>
                 </div>
+            </div>
+
+            <div id="vistaPerfil" class="oculto">
+                <div class="tarjeta">
+                    <h2>👤 Mi Perfil Biométrico</h2>
+                    <p style="font-size: 13px; color: #aaa; margin-top: -10px; margin-bottom: 15px;">Mantené tu peso y medidas actualizados para mejorar las métricas.</p>
+                    
+                    <label style="font-size: 12px; color: #aaa; font-weight: bold;">Peso Corporal (Termodinámica)</label>
+                    <input type="number" id="inputPesoCorporal" placeholder="Tu peso actual (kg)" step="0.1">
+                    
+                    <label style="font-size: 12px; color: #aaa; font-weight: bold; margin-top: 10px;">Medidas (Para V-Taper)</label>
+                    <div class="form-fila">
+                        <input type="number" id="inputHombros" placeholder="Hombros/Espalda (cm)" step="0.1">
+                        <input type="number" id="inputCintura" placeholder="Cintura (cm)" step="0.1">
+                    </div>
+
+                    <button class="btn-principal" onclick="guardarPerfil()">Guardar Perfil</button>
+                </div>
+
+                <button class="btn-principal btn-peligro" style="background: transparent; border: 1px solid var(--peligro); margin-top: 20px;" onclick="cerrarSesion()">🚪 Cerrar Sesión</button>
             </div>
 
             <div id="vistaEntrenamiento" class="oculto">
@@ -195,12 +236,19 @@
 
                     <div class="grid-datos">
                         <div class="dato-caja">
-                            <span>Reps (Target)</span>
+                            <span>Reps</span>
                             <input type="number" id="uiRepsInput" class="input-progreso">
                         </div>
                         <div class="dato-caja">
-                            <span>Peso (Kg)</span>
-                            <input type="number" id="uiPesoInput" class="input-progreso">
+                            <span>Kg</span>
+                            <input type="number" id="uiPesoInput" class="input-progreso" step="0.5">
+                        </div>
+                        <div class="dato-caja">
+                            <span>Esfuerzo</span>
+                            <select id="uiRirInput" class="input-progreso">
+                                <option value="calentamiento" style="color: var(--alerta);">Calentar</option>
+                                <option value="efectiva" selected style="color: var(--exito);">RIR 0-2</option>
+                            </select>
                         </div>
                     </div>
 
@@ -235,6 +283,21 @@
                 </div>
             </div>
 
+            <div id="modalFatiga" class="modal-overlay oculto">
+                <div class="modal-content">
+                    <h2 style="color: var(--primario); margin-top: 0;">¡Entrenamiento Listo!</h2>
+                    <p style="font-size: 14px; color: #aaa;">Antes de guardar, ¿cómo te sentiste a nivel SNC y energía general?</p>
+                    
+                    <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                        <button class="btn-emoji" onclick="guardarFatigaYFinalizar('😫 Agotado')" title="Agotado / Mal dormido">😫</button>
+                        <button class="btn-emoji" onclick="guardarFatigaYFinalizar('😐 Normal')" title="Normal / Mantenimiento">😐</button>
+                        <button class="btn-emoji" onclick="guardarFatigaYFinalizar('🦍 Modo Bestia')" title="Modo Bestia / PRs rotos">🦍</button>
+                    </div>
+                    
+                    <textarea id="inputNotasRutina" placeholder="Notas (Opcional). Ej: Dormí 4 horas, me costó el press de hombros..." style="font-size: 13px;"></textarea>
+                </div>
+            </div>
+
             <div class="navegacion" id="navInferior">
                 <button class="tab-btn activo" id="btnTabEntrenar" onclick="cambiarVistaPrincipal('entrenar')">
                     <i>🏋️</i><span>Entrenar</span>
@@ -245,8 +308,8 @@
                 <button class="tab-btn" id="btnTabMetricas" onclick="cambiarVistaPrincipal('metricas')">
                     <i>📊</i><span>Métricas</span>
                 </button>
-                <button class="tab-btn" onclick="cerrarSesion()" style="color: var(--peligro);">
-                    <i>🚪</i><span>Salir</span>
+                <button class="tab-btn" id="btnTabPerfil" onclick="cambiarVistaPrincipal('perfil')">
+                    <i>👤</i><span>Perfil</span>
                 </button>
             </div>
 
@@ -256,17 +319,16 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-        // IMPORTAMOS deleteDoc PARA PODER BORRAR SESIONES
         import { getFirestore, doc, setDoc, collection, addDoc, query, orderBy, limit, onSnapshot, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         const firebaseConfig = {
-            apiKey: "AIzaSyCIXKUvH-gqs1-X6Ja2q-c22TJStySqiPM",
-            authDomain: "appestudio-ingenieria.firebaseapp.com",
-            projectId: "appestudio-ingenieria",
-            storageBucket: "appestudio-ingenieria.firebasestorage.app",
-            messagingSenderId: "463771071769",
-            appId: "1:463771071769:web:4637b16a0875e0ae948188"
-        };
+    		apiKey: "AIzaSyDYNhDmk3lT6ol7FjFPb3Cv121SdQQU6eU",
+    		authDomain: "app-entrenamiento-daf51.firebaseapp.com",
+    		projectId: "app-entrenamiento-daf51",
+    		storageBucket: "app-entrenamiento-daf51.firebasestorage.app",
+    		messagingSenderId: "259599764141",
+    		appId: "1:259599764141:web:8d2841d173b33ba1455424"
+ 	};
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
@@ -293,6 +355,8 @@
         let estadoActual = { idRutina: null, ejercicioIndex: 0, serieActual: 1, datosRutina: null, volumenAcumulado: 0 };
         let temporizador; let tiempoRestante = 0; let wakeLock = null; let graficoVolumen = null; let unsubscribeRutinas = null;
         let temporizadorTotal; let segundosTotales = 0;
+        
+        let pesoCorporalUsuario = 69;
 
         function poblarSelectores() {
             const selectores = ['selectorRutina', 'editorSelectorRutina'];
@@ -304,6 +368,24 @@
         }
 
         window.guardarRutinasEnNube = function() { setDoc(doc(db, "usuarios", auth.currentUser.uid), { rutinasCustom: misRutinas }, { merge: true }).catch(e => console.error(e)); }
+        
+        // --- GUARDADO DE PERFIL Y V-TAPER ---
+        window.guardarPerfil = function() {
+            const nuevoPeso = parseFloat(document.getElementById('inputPesoCorporal').value);
+            const hombros = parseFloat(document.getElementById('inputHombros').value);
+            const cintura = parseFloat(document.getElementById('inputCintura').value);
+            
+            if(isNaN(nuevoPeso) || nuevoPeso <= 0) { alert("Ingresá un peso válido."); return; }
+            
+            const datosGuardar = { pesoCorporal: nuevoPeso };
+            if(!isNaN(hombros) && hombros > 0) datosGuardar.hombros = hombros;
+            if(!isNaN(cintura) && cintura > 0) datosGuardar.cintura = cintura;
+
+            setDoc(doc(db, "usuarios", auth.currentUser.uid), datosGuardar, { merge: true }).then(() => {
+                pesoCorporalUsuario = nuevoPeso;
+                alert("¡Perfil biométrico y medidas actualizados!");
+            }).catch(e => console.error(e));
+        }
 
         // --- AUTH Y FIREBASE ---
         window.iniciarSesion = function() { const email = document.getElementById('loginEmail').value; const pass = document.getElementById('loginPassword').value; signInWithEmailAndPassword(auth, email, pass).catch(e => { document.getElementById('loginError').style.display = "block"; document.getElementById('loginError').innerText = "Error: " + e.message; }); }
@@ -313,8 +395,22 @@
             if (user) {
                 document.getElementById('vistaLogin').classList.add('oculto'); document.getElementById('appPrincipal').classList.remove('oculto');
                 unsubscribeRutinas = onSnapshot(doc(db, "usuarios", user.uid), (docSnap) => {
-                    if (docSnap.exists() && docSnap.data().rutinasCustom) { misRutinas = docSnap.data().rutinasCustom; } 
-                    else { misRutinas = JSON.parse(JSON.stringify(RUTINAS_DEFAULT)); guardarRutinasEnNube(); }
+                    if (docSnap.exists()) {
+                        const data = docSnap.data();
+                        if(data.rutinasCustom) { misRutinas = data.rutinasCustom; } else { misRutinas = JSON.parse(JSON.stringify(RUTINAS_DEFAULT)); guardarRutinasEnNube(); }
+                        if(data.pesoCorporal) { pesoCorporalUsuario = data.pesoCorporal; document.getElementById('inputPesoCorporal').value = pesoCorporalUsuario; }
+                        
+                        // Render V-TAPER
+                        if(data.hombros) document.getElementById('inputHombros').value = data.hombros;
+                        if(data.cintura) document.getElementById('inputCintura').value = data.cintura;
+                        if(data.hombros && data.cintura) {
+                            let ratio = (data.hombros / data.cintura).toFixed(2);
+                            document.getElementById('uiVTaperDisplay').innerText = ratio;
+                        }
+
+                    } else { 
+                        misRutinas = JSON.parse(JSON.stringify(RUTINAS_DEFAULT)); guardarRutinasEnNube(); 
+                    }
                     poblarSelectores();
                 });
                 cargarHistorial(user.uid);
@@ -326,7 +422,6 @@
 
         // --- HISTORIAL, GRÁFICOS Y CALENDARIO ---
         function cargarHistorial(uid) {
-            // Aumentamos el límite para que el calendario tenga datos del mes entero
             const q = query(collection(db, "usuarios", uid, "historial_gym"), orderBy("fecha", "desc"), limit(50));
             onSnapshot(q, (snapshot) => {
                 const contenedor = document.getElementById('listaHistorial'); contenedor.innerHTML = '';
@@ -340,15 +435,23 @@
                     const volumenCarga = data.volumen ? `${data.volumen} kg` : '--';
                     const calorias = data.calorias ? `🔥 ${data.calorias} kcal` : '';
                     
-                    // NUEVO: Agregado botón de eliminar sesión (Cesto de basura)
+                    // Verificamos si hay nota de fatiga o de texto
+                    let htmlNota = '';
+                    if(data.fatiga || data.notas) {
+                        const iconFatiga = data.fatiga ? data.fatiga : '';
+                        const textNota = data.notas ? ` - ${data.notas}` : '';
+                        htmlNota = `<p class="historial-nota">${iconFatiga}${textNota}</p>`;
+                    }
+
                     contenedor.innerHTML += `
                         <div class="historial-item">
                             <div class="historial-info" style="flex:1;">
-                                <strong>${data.rutina}</strong>
+                                <strong style="font-size:14px;">${data.rutina}</strong>
                                 <p>📅 ${fechaStr} | ⏱️ ${Math.round(data.duracionMinutos)} min <span style="color:var(--alerta); margin-left:5px;">${calorias}</span></p>
+                                ${htmlNota}
                             </div>
                             <div style="display:flex; flex-direction:column; align-items:flex-end; gap:5px;">
-                                <button onclick="eliminarHistorial('${data.id}')" style="background:none; border:none; color:var(--peligro); font-size:16px; cursor:pointer;">🗑️</button>
+                                <button onclick="eliminarHistorial('${data.id}')" style="background:none; border:none; color:var(--peligro); font-size:16px; cursor:pointer; padding:0;">🗑️</button>
                                 <div class="historial-volumen">${volumenCarga}</div>
                             </div>
                         </div>
@@ -372,23 +475,16 @@
         }
 
         function renderizarCalendario(entrenamientos) {
-            const contenedor = document.getElementById('calendarioDias');
-            contenedor.innerHTML = '';
-            
-            const fecha = new Date();
-            const mesActual = fecha.getMonth();
-            const anioActual = fecha.getFullYear();
-            const primerDiaDelMes = new Date(anioActual, mesActual, 1).getDay(); // 0 = Domingo
+            const contenedor = document.getElementById('calendarioDias'); contenedor.innerHTML = '';
+            const fecha = new Date(); const mesActual = fecha.getMonth(); const anioActual = fecha.getFullYear();
+            const primerDiaDelMes = new Date(anioActual, mesActual, 1).getDay();
             const diasEnMes = new Date(anioActual, mesActual + 1, 0).getDate();
 
-            // Extraemos los días en que se registró un entrenamiento en este mes
             const diasEntrenados = entrenamientos
                 .filter(e => new Date(e.fecha).getMonth() === mesActual && new Date(e.fecha).getFullYear() === anioActual)
                 .map(e => new Date(e.fecha).getDate());
 
-            // Rellenar espacios vacíos al inicio del mes
             for(let i=0; i<primerDiaDelMes; i++) { contenedor.innerHTML += `<div></div>`; }
-
             for(let i=1; i<=diasEnMes; i++) {
                 let clase = 'dia-cal';
                 if(diasEntrenados.includes(i)) clase += ' entrenado';
@@ -401,7 +497,7 @@
             if(!document.getElementById('chartVolumen')) return;
             const ctx = document.getElementById('chartVolumen').getContext('2d');
             if(graficoVolumen) graficoVolumen.destroy();
-            graficoVolumen = new Chart(ctx, { type: 'bar', data: { labels: labels, datasets: [{ label: 'Volumen Total (Kg)', data: data, backgroundColor: '#3498db', borderRadius: 4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { color: '#aaa' }, grid: { color: '#333' } }, x: { ticks: { color: '#aaa' }, grid: { display: false } } } } });
+            graficoVolumen = new Chart(ctx, { type: 'bar', data: { labels: labels, datasets: [{ label: 'Volumen Efectivo (Kg)', data: data, backgroundColor: '#3498db', borderRadius: 4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { color: '#aaa' }, grid: { color: '#333' } }, x: { ticks: { color: '#aaa' }, grid: { display: false } } } } });
         }
 
         // --- EDITOR Y CALENDARIO DINÁMICO ---
@@ -440,20 +536,22 @@
         }
 
         window.cambiarVistaPrincipal = function(vista) {
-            // FIX DEL BUG: Nos aseguramos de ocultar completamente el modo entrenamiento
             document.getElementById('vistaEstadisticas').classList.add('oculto'); 
             document.getElementById('vistaSeleccion').classList.add('oculto'); 
             document.getElementById('vistaEditor').classList.add('oculto');
+            document.getElementById('vistaPerfil').classList.add('oculto');
             document.getElementById('vistaEntrenamiento').classList.add('oculto');
             document.getElementById('vistaDescanso').classList.add('oculto');
             
             document.getElementById('btnTabEntrenar').classList.remove('activo'); 
             document.getElementById('btnTabMetricas').classList.remove('activo');
             document.getElementById('btnTabGestor').classList.remove('activo');
+            document.getElementById('btnTabPerfil').classList.remove('activo');
 
             if(vista === 'entrenar') { document.getElementById('vistaSeleccion').classList.remove('oculto'); document.getElementById('btnTabEntrenar').classList.add('activo'); } 
             else if (vista === 'metricas') { document.getElementById('vistaEstadisticas').classList.remove('oculto'); document.getElementById('btnTabMetricas').classList.add('activo'); } 
             else if (vista === 'gestor') { document.getElementById('vistaEditor').classList.remove('oculto'); document.getElementById('btnTabGestor').classList.add('activo'); mostrarEjerciciosEditor(); }
+            else if (vista === 'perfil') { document.getElementById('vistaPerfil').classList.remove('oculto'); document.getElementById('btnTabPerfil').classList.add('activo'); }
         }
 
         // --- MOTOR DEL ENTRENAMIENTO Y SOBRECARGA ---
@@ -464,7 +562,6 @@
             
             try { if ('wakeLock' in navigator) { wakeLock = await navigator.wakeLock.request('screen'); } } catch (err) {}
             
-            // Cronómetro Total Global
             segundosTotales = 0;
             clearInterval(temporizadorTotal);
             temporizadorTotal = setInterval(() => {
@@ -483,9 +580,9 @@
             document.getElementById('uiRutinaNombre').innerText = `${estadoActual.datosRutina.nombre} • Ejercicio ${estadoActual.ejercicioIndex + 1} de ${estadoActual.datosRutina.ejercicios.length}`;
             document.getElementById('uiEjercicioNombre').innerText = ejercicio.nombre; document.getElementById('uiEjercicioTipo').innerText = ejercicio.tipo; 
             
-            // Carga pre-llenada en los inputs para la sobrecarga progresiva
             document.getElementById('uiRepsInput').value = ejercicio.reps; 
             document.getElementById('uiPesoInput').value = ejercicio.peso;
+            document.getElementById('uiRirInput').value = "efectiva";
 
             const contenedorSeries = document.getElementById('uiSeriesVisuales'); contenedorSeries.innerHTML = '';
             for(let i=1; i <= ejercicio.series; i++) {
@@ -500,17 +597,16 @@
         window.manejarBotonPrincipal = function() {
             const ejercicio = estadoActual.datosRutina.ejercicios[estadoActual.ejercicioIndex];
             
-            // Lógica Carga Progresiva: Captura lo que realmente hiciste
+            const rirSeleccionado = document.getElementById('uiRirInput').value;
             const repsHechas = parseInt(document.getElementById('uiRepsInput').value) || ejercicio.reps;
             const pesoUsado = parseFloat(document.getElementById('uiPesoInput').value) || ejercicio.peso;
             
-            estadoActual.volumenAcumulado += (repsHechas * pesoUsado);
-
-            // Actualizamos la rutina base silenciosamente. La próxima vez, la app recordará tu nuevo PR.
-            if(pesoUsado !== ejercicio.peso || repsHechas !== ejercicio.reps) {
-                ejercicio.peso = pesoUsado;
-                ejercicio.reps = repsHechas;
-                guardarRutinasEnNube();
+            if(rirSeleccionado !== "calentamiento") {
+                estadoActual.volumenAcumulado += (repsHechas * pesoUsado);
+                if(pesoUsado !== ejercicio.peso || repsHechas !== ejercicio.reps) {
+                    ejercicio.peso = pesoUsado; ejercicio.reps = repsHechas;
+                    guardarRutinasEnNube();
+                }
             }
             
             if (estadoActual.serieActual < ejercicio.series) {
@@ -523,7 +619,8 @@
                     const proxEjercicio = estadoActual.datosRutina.ejercicios[estadoActual.ejercicioIndex];
                     iniciarDescanso(tiempoTransicion, "Transición de Ejercicio", `Acomodá los discos para: ${proxEjercicio.nombre}`);
                 } else {
-                    finalizarRutina();
+                    // LLAMAMOS AL MODAL DE FATIGA EN LUGAR DE CERRAR DIRECTO
+                    mostrarModalFatiga();
                 }
             }
         }
@@ -553,18 +650,28 @@
             actualizarUIEjercicio();
         }
 
-        async function finalizarRutina() {
+        // --- SISTEMA DE FATIGA Y FINALIZAR ---
+        window.mostrarModalFatiga = function() {
             clearInterval(temporizador); clearInterval(temporizadorTotal);
-            const duracionMin = segundosTotales / 60;
-            
-            // Fórmula termodinámica de calorías (MET * kg * horas)
-            const caloriasQuemadas = Math.round(5.0 * 69 * (duracionMin / 60));
+            document.getElementById('modalFatiga').classList.remove('oculto');
+            document.getElementById('inputNotasRutina').value = ""; // Limpiamos notas
+        }
 
-            alert(`¡Entrenamiento Completado! 🏆\nDuración total: ${Math.round(duracionMin)} minutos.\nVolumen movido: ${estadoActual.volumenAcumulado} kg.\nCalorías aprox: ${caloriasQuemadas} kcal.`);
+        window.guardarFatigaYFinalizar = async function(nivelFatiga) {
+            document.getElementById('modalFatiga').classList.add('oculto');
+            const notasUsuario = document.getElementById('inputNotasRutina').value.trim();
+            const duracionMin = segundosTotales / 60;
+            const caloriasQuemadas = Math.round(5.0 * pesoCorporalUsuario * (duracionMin / 60));
 
             try {
                 await addDoc(collection(db, "usuarios", auth.currentUser.uid, "historial_gym"), {
-                    rutina: estadoActual.datosRutina.nombre, fecha: Date.now(), duracionMinutos: duracionMin, volumen: estadoActual.volumenAcumulado, calorias: caloriasQuemadas
+                    rutina: estadoActual.datosRutina.nombre, 
+                    fecha: Date.now(), 
+                    duracionMinutos: duracionMin, 
+                    volumen: estadoActual.volumenAcumulado, 
+                    calorias: caloriasQuemadas,
+                    fatiga: nivelFatiga,
+                    notas: notasUsuario
                 });
             } catch (e) { console.error(e); }
 
@@ -578,6 +685,8 @@
                 clearInterval(temporizador); clearInterval(temporizadorTotal);
                 if(wakeLock !== null) { wakeLock.release(); wakeLock = null; }
                 document.getElementById('navInferior').classList.remove('oculto');
+                document.getElementById('vistaEntrenamiento').classList.add('oculto');
+                document.getElementById('vistaDescanso').classList.add('oculto');
                 cambiarVistaPrincipal('entrenar');
             }
         }
