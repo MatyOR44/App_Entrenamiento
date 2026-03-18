@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>App Entrenamiento</title>
+    
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#121212">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        /* --- DISEÑO MODO OSCURO --- */
+        :root {
+            --fondo: #121212; --tarjeta: #1E1E1E; --texto: #E0E0E0;
+            --primario: #3498db; --exito: #2ECC71; --alerta: #F39C12;
+            --peligro: #E74C3C; --borde: #333333;
+        }
+
+        * { box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Roboto, sans-serif; background-color: var(--fondo); color: var(--texto); margin: 0; padding: 15px; padding-bottom: 100px; display: flex; justify-content: center; }
+        .contenedor { max-width: 600px; width: 100%; }
+        
+        h1 { text-align: center; color: var(--primario); margin-bottom: 20px; font-size: 24px; text-transform: uppercase; letter-spacing: 1px; }
+        h2 { color: var(--texto); font-size: 18px; border-bottom: 1px solid var(--borde); padding-bottom: 10px; margin-top: 0; }
+
+        .tarjeta { background-color: var(--tarjeta); border-radius: 12px; padding: 20px; margin-bottom: 20px; border: 1px solid var(--borde); box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        
+        select, input { width: 100%; padding: 15px; margin-bottom: 15px; background-color: #2C2C2C; color: var(--texto); border: 1px solid var(--borde); border-radius: 8px; font-size: 16px; }
+        
+        .btn-principal { width: 100%; padding: 18px; border: none; border-radius: 10px; font-size: 18px; font-weight: bold; color: white; background-color: var(--primario); cursor: pointer; transition: 0.2s; display: flex; justify-content: center; align-items: center; gap: 10px; }
+        .btn-principal:active { transform: scale(0.98); opacity: 0.8; }
+        .btn-exito { background-color: var(--exito); }
+        .btn-peligro { background-color: var(--peligro); }
+        .btn-alerta { background-color: var(--alerta); }
+
+        /* --- UI DEL ENTRENAMIENTO ACTIVO --- */
+        .ejercicio-header { text-align: center; margin-bottom: 20px; }
+        .ejercicio-titulo { font-size: 22px; color: var(--primario); font-weight: bold; margin: 0 0 5px 0; }
+        .ejercicio-tipo { font-size: 12px; text-transform: uppercase; background: #333; padding: 4px 10px; border-radius: 12px; display: inline-block; color: #aaa; }
+        
+        .grid-datos { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
+        .dato-caja { background: #2C2C2C; padding: 15px; border-radius: 10px; text-align: center; border: 1px solid #444; }
+        .dato-caja span { display: block; font-size: 12px; color: #aaa; text-transform: uppercase; margin-bottom: 5px; }
+        .input-progreso { background: transparent; border: none; color: white; font-size: 28px; font-weight: bold; text-align: center; padding: 0; margin: 0; width: 100%; }
+        .input-progreso:focus { outline: none; border-bottom: 2px solid var(--primario); }
+
+        .progreso-series { display: flex; justify-content: center; gap: 8px; margin-bottom: 25px; flex-wrap: wrap; }
+        .bolita-serie { width: 25px; height: 25px; border-radius: 50%; background-color: #333; border: 2px solid #555; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; }
+        .bolita-serie.activa { background-color: var(--alerta); border-color: var(--alerta); color: black; }
+        .bolita-serie.completada { background-color: var(--exito); border-color: var(--exito); color: black; }
+
+        /* --- RELOJ GIGANTE --- */
+        .reloj-contenedor { text-align: center; margin: 30px 0; }
+        .reloj-display { font-size: 80px; font-weight: bold; font-family: monospace; color: var(--alerta); text-shadow: 0 0 10px rgba(243, 156, 18, 0.3); }
+        .reloj-mensaje { color: #aaa; font-size: 16px; margin-bottom: 10px; }
+
+        .oculto { display: none !important; }
+        
+        .historial-item { border-left: 4px solid var(--exito); background: #252525; padding: 15px; margin-bottom: 10px; border-radius: 0 8px 8px 0; display: flex; justify-content: space-between; align-items: center; }
+        .historial-info p { margin: 5px 0 0 0; font-size: 12px; color: #aaa; }
+        .historial-volumen { font-size: 15px; font-weight: bold; color: var(--primario); text-align: right; }
+
+        /* --- SELECTOR DE DÍAS Y RUTINA DIARIA --- */
+        .dias-selector { display: flex; gap: 8px; overflow-x: auto; margin-bottom: 20px; padding-bottom: 5px; scrollbar-width: none; }
+        .dias-selector::-webkit-scrollbar { display: none; }
+        .dia-btn { flex: 0 0 auto; background: #252525; border: 1px solid var(--borde); color: #aaa; padding: 8px 15px; border-radius: 20px; font-size: 13px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .dia-btn.activo { background: var(--primario); color: white; border-color: var(--primario); }
+        
+        .rutina-hoy-card { background: #252525; padding: 15px; border-radius: 8px; margin-bottom: 12px; border-left: 4px solid var(--exito); display: flex; justify-content: space-between; align-items: center; }
+        .rutina-hoy-card strong { display: block; font-size: 16px; color: white; }
+        .rutina-hoy-card span { font-size: 12px; color: #aaa; }
+        .btn-play-chico { width: auto; padding: 10px 20px; font-size: 14px; border-radius: 8px; }
+        details summary { padding: 10px; background: #252525; border-radius: 8px; cursor: pointer; font-weight: bold; color: #aaa; border: 1px solid var(--borde); }
+
+        /* --- EDITOR DE RUTINAS --- */
+        .lista-editor-item { background: #252525; padding: 12px; border-radius: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border-left: 3px solid var(--primario); }
+        .lista-editor-item p { margin: 0 0 4px 0; font-size: 15px; font-weight: bold; }
+        .lista-editor-item small { color: #aaa; font-size: 12px; }
+        .form-fila { display: flex; gap: 10px; }
+        .form-fila input { flex: 1; }
+
+        /* --- CALENDARIO CONSTANCIA --- */
+        .calendario-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; text-align: center; margin-bottom: 15px; }
+        .dia-cal { background: #252525; padding: 8px 0; border-radius: 6px; font-size: 13px; color: #7f8c8d; }
+        .dia-cal.entrenado { background: var(--primario); color: white; font-weight: bold; border: 1px solid #5DADE2; }
+        .dia-cal.hoy { border: 2px solid var(--alerta); color: white; }
+        .dia-nombre { font-size: 11px; text-transform: uppercase; color: #666; font-weight: bold; margin-bottom: 5px; }
+
+        /* --- NAVEGACIÓN INFERIOR --- */
+        .navegacion { position: fixed; bottom: 0; left: 0; width: 100%; background-color: var(--tarjeta); box-shadow: 0 -2px 10px rgba(0,0,0,0.5); display: flex; justify-content: space-around; padding: 8px 0 15px 0; z-index: 1000; border-radius: 16px 16px 0 0; border-top: 1px solid var(--borde); }
+        .tab-btn { flex: 1; display: flex; flex-direction: column; align-items: center; background: none; border: none; font-size: 11px; font-weight: 600; color: #aaa; cursor: pointer; transition: 0.2s; }
+        .tab-btn i { font-size: 22px; margin-bottom: 4px; font-style: normal; transition: 0.2s; filter: grayscale(100%); opacity: 0.6; }
+        .tab-btn.activo { color: var(--primario); }
+        .tab-btn.activo i { filter: grayscale(0%); opacity: 1; transform: scale(1.1); }
+
+        .grafico-contenedor { position: relative; height: 250px; width: 100%; margin-top: 20px; }
+    </style>
+</head>
+<body>
+
+    <div class="contenedor">
+        <h1>💪 App Entrenamiento</h1>
+
+        <div id="vistaLogin" class="tarjeta">
+            <h2>Acceso a la Nube</h2>
+            <input type="email" id="loginEmail" placeholder="Correo electrónico">
+            <input type="password" id="loginPassword" placeholder="Contraseña">
+            <button class="btn-principal" onclick="iniciarSesion()">Ingresar</button>
+            <p id="loginError" style="color: var(--peligro); font-size: 13px; display: none;"></p>
+        </div>
+
+        <div id="appPrincipal" class="oculto">
+
+            <div id="vistaSeleccion">
+                <div class="tarjeta">
+                    <h2>Empezar Entrenamiento</h2>
+                    <div class="dias-selector" id="uiSelectorDias"></div>
+                    <h2 id="tituloDiaPlan" style="color: var(--primario); font-size: 18px; border:none; padding:0;">Rutina de Hoy</h2>
+                    <div id="contenedorRutinasHoy" style="margin-top: 15px;"></div>
+
+                    <details style="margin-top: 20px;">
+                        <summary>Ver todas las rutinas (Entrenamiento Libre)</summary>
+                        <div style="margin-top: 15px;">
+                            <select id="selectorRutina"></select>
+                            <button class="btn-principal" style="padding: 14px;" onclick="iniciarRutina(document.getElementById('selectorRutina').value)">▶ Arrancar Libre</button>
+                        </div>
+                    </details>
+                </div>
+                
+                <div class="tarjeta">
+                    <h2>Últimos Entrenamientos</h2>
+                    <div id="listaHistorial">Aún no hay entrenamientos registrados.</div>
+                </div>
+            </div>
+
+            <div id="vistaEditor" class="oculto">
+                <div class="tarjeta">
+                    <h2>Modificar Rutina</h2>
+                    <p style="font-size: 12px; color: #aaa; margin-top: -10px; margin-bottom: 15px;">Podés agregar nuevos ejercicios, eliminarlos o cambiar el orden en el que los ejecutás.</p>
+                    <select id="editorSelectorRutina" onchange="mostrarEjerciciosEditor()"></select>
+                    <div id="listaEjerciciosEditor" style="margin-top: 15px;"></div>
+                </div>
+
+                <div class="tarjeta" style="border-left: 4px solid var(--alerta);">
+                    <h2>Añadir Ejercicio Nuevo</h2>
+                    <input type="text" id="nuevoEjNombre" placeholder="Nombre (Ej: Dips en Paralelas)">
+                    <div class="form-fila">
+                        <input type="number" id="nuevoEjSeries" placeholder="Series (Ej: 3)">
+                        <input type="number" id="nuevoEjReps" placeholder="Reps (Ej: 12)">
+                    </div>
+                    <div class="form-fila">
+                        <input type="number" id="nuevoEjPeso" placeholder="Peso en kg (Ej: 0)">
+                        <input type="number" id="nuevoEjDescanso" placeholder="Descanso en seg (Ej: 90)">
+                    </div>
+                    <select id="nuevoEjTipo">
+                        <option value="compuesto">Compuesto</option>
+                        <option value="aislado">Aislado</option>
+                    </select>
+                    <button class="btn-principal btn-exito" onclick="agregarEjercicioEditor()">➕ Añadir Ejercicio a la Rutina</button>
+                </div>
+            </div>
+
+            <div id="vistaEstadisticas" class="oculto">
+                <div class="tarjeta">
+                    <h2>Constancia (Mes Actual)</h2>
+                    <div class="calendario-grid" style="border-bottom: none; margin-bottom: 5px;">
+                        <div class="dia-nombre">D</div><div class="dia-nombre">L</div><div class="dia-nombre">M</div>
+                        <div class="dia-nombre">X</div><div class="dia-nombre">J</div><div class="dia-nombre">V</div><div class="dia-nombre">S</div>
+                    </div>
+                    <div class="calendario-grid" id="calendarioDias"></div>
+                </div>
+
+                <div class="tarjeta">
+                    <h2>Volumen de Carga (Tonelaje)</h2>
+                    <div class="grafico-contenedor">
+                        <canvas id="chartVolumen"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div id="vistaEntrenamiento" class="oculto">
+                <div class="tarjeta">
+                    
+                    <div id="uiTiempoTotal" style="text-align:center; color: #aaa; font-family: monospace; font-size: 16px; margin-bottom: 10px;">
+                        ⏱️ Tiempo Total: 00:00
+                    </div>
+
+                    <div class="ejercicio-header">
+                        <p id="uiRutinaNombre" style="color: #aaa; font-size: 12px; margin: 0 0 10px 0; text-transform: uppercase;">Push 1.1</p>
+                        <h2 id="uiEjercicioNombre" class="ejercicio-titulo">Press Inclinado</h2>
+                        <span id="uiEjercicioTipo" class="ejercicio-tipo">Compuesto</span>
+                    </div>
+
+                    <div class="grid-datos">
+                        <div class="dato-caja">
+                            <span>Reps (Target)</span>
+                            <input type="number" id="uiRepsInput" class="input-progreso">
+                        </div>
+                        <div class="dato-caja">
+                            <span>Peso (Kg)</span>
+                            <input type="number" id="uiPesoInput" class="input-progreso">
+                        </div>
+                    </div>
+
+                    <div class="progreso-series" id="uiSeriesVisuales"></div>
+
+                    <button id="btnAccionPrincipal" class="btn-principal" onclick="manejarBotonPrincipal()">
+                        ✔️ Completar Serie
+                    </button>
+                    
+                    <button class="btn-principal btn-peligro" style="margin-top: 20px; background: transparent; border: 1px solid var(--peligro);" onclick="cancelarRutina()">
+                        ⏹ Cancelar Entrenamiento
+                    </button>
+                </div>
+            </div>
+
+            <div id="vistaDescanso" class="oculto">
+                <div class="tarjeta" style="text-align: center;">
+                    <p class="reloj-mensaje" id="mensajeDescanso">Recuperando ATP...</p>
+                    <div class="reloj-contenedor">
+                        <div id="relojDisplay" class="reloj-display">00:00</div>
+                    </div>
+                    
+                    <div style="background: #252525; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid var(--primario);">
+                        <span style="font-size: 12px; color: #aaa; text-transform: uppercase;">Preparate para:</span>
+                        <p id="proximoPasoMensaje" style="margin: 5px 0 0 0; font-weight: bold; font-size: 16px;">Siguiente Serie</p>
+                    </div>
+
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn-principal btn-alerta" style="flex: 1;" onclick="sumarTiempo(30)">+30s</button>
+                        <button class="btn-principal btn-exito" style="flex: 2;" onclick="saltarDescanso()">Saltar ⏭</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="navegacion" id="navInferior">
+                <button class="tab-btn activo" id="btnTabEntrenar" onclick="cambiarVistaPrincipal('entrenar')">
+                    <i>🏋️</i><span>Entrenar</span>
+                </button>
+                <button class="tab-btn" id="btnTabGestor" onclick="cambiarVistaPrincipal('gestor')">
+                    <i>⚙️</i><span>Editor</span>
+                </button>
+                <button class="tab-btn" id="btnTabMetricas" onclick="cambiarVistaPrincipal('metricas')">
+                    <i>📊</i><span>Métricas</span>
+                </button>
+                <button class="tab-btn" onclick="cerrarSesion()" style="color: var(--peligro);">
+                    <i>🚪</i><span>Salir</span>
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        // IMPORTAMOS deleteDoc PARA PODER BORRAR SESIONES
+        import { getFirestore, doc, setDoc, collection, addDoc, query, orderBy, limit, onSnapshot, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCIXKUvH-gqs1-X6Ja2q-c22TJStySqiPM",
+            authDomain: "appestudio-ingenieria.firebaseapp.com",
+            projectId: "appestudio-ingenieria",
+            storageBucket: "appestudio-ingenieria.firebasestorage.app",
+            messagingSenderId: "463771071769",
+            appId: "1:463771071769:web:4637b16a0875e0ae948188"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // --- RUTINAS POR DEFECTO ---
+        const RUTINAS_DEFAULT = {
+            "push_1_1": { nombre: "Push 1.1 (Pecho y Triceps)", ejercicios: [ { nombre: "Press Inclinado (Barra)", series: 4, reps: 15, peso: 36, descanso: 120, tipo: "compuesto" }, { nombre: "Press Plano (Barra)", series: 4, reps: 15, peso: 36, descanso: 120, tipo: "compuesto" }, { nombre: "Aperturas (Dumbbell Fly)", series: 3, reps: 12, peso: 20, descanso: 90, tipo: "aislado" }, { nombre: "Press Frances (Barra)", series: 3, reps: 12, peso: 15, descanso: 90, tipo: "aislado" }, { nombre: "Extensión Tríceps (Cuerda)", series: 3, reps: 12, peso: 11, descanso: 75, tipo: "aislado" } ] },
+            "push_1_2": { nombre: "Push 1.2 (Hombros)", ejercicios: [ { nombre: "Elevaciones Laterales (Mancuernas)", series: 4, reps: 15, peso: 7, descanso: 75, tipo: "aislado" }, { nombre: "Press Militar Sentado", series: 4, reps: 10, peso: 15, descanso: 90, tipo: "compuesto" }, { nombre: "Elevaciones Laterales (Inclinado)", series: 3, reps: 15, peso: 8, descanso: 75, tipo: "aislado" }, { nombre: "Press Arnold", series: 4, reps: 12, peso: 12, descanso: 90, tipo: "compuesto" } ] },
+            "push_2": { nombre: "Push 2", ejercicios: [ { nombre: "Elevaciones Laterales (Mancuernas)", series: 4, reps: 15, peso: 7, descanso: 75, tipo: "aislado" }, { nombre: "Press Inclinado (Barra)", series: 4, reps: 15, peso: 36, descanso: 120, tipo: "compuesto" }, { nombre: "Press Militar Sentado", series: 3, reps: 10, peso: 15, descanso: 90, tipo: "compuesto" }, { nombre: "Press Plano con Barra", series: 4, reps: 15, peso: 36, descanso: 120, tipo: "compuesto" }, { nombre: "Aperturas 90° (Maquina)", series: 3, reps: 15, peso: 22, descanso: 90, tipo: "aislado" }, { nombre: "Elevaciones Laterales (Inclinado)", series: 3, reps: 15, peso: 8, descanso: 75, tipo: "aislado" }, { nombre: "Extension sobre la Cabeza (Cuerda)", series: 3, reps: 12, peso: 11, descanso: 90, tipo: "aislado" }, { nombre: "Extensión Tríceps (Barra)", series: 3, reps: 15, peso: 17, descanso: 75, tipo: "aislado" } ] },
+            "pull_1": { nombre: "Pull 1", ejercicios: [ { nombre: "Jalón al Pecho (Abierto)", series: 4, reps: 12, peso: 40, descanso: 120, tipo: "compuesto" }, { nombre: "Remo con Mancuerna", series: 3, reps: 12, peso: 15, descanso: 90, tipo: "compuesto" }, { nombre: "Pull-Over con Cuerda", series: 3, reps: 15, peso: 11, descanso: 75, tipo: "aislado" }, { nombre: "Face Pull (Cuerda)", series: 3, reps: 15, peso: 11, descanso: 75, tipo: "compuesto" }, { nombre: "Curl con Barra de Pie", series: 3, reps: 12, peso: 24, descanso: 90, tipo: "aislado" }, { nombre: "Curl Invertido (Barra)", series: 3, reps: 15, peso: 15, descanso: 75, tipo: "aislado" }, { nombre: "Flexión de Muñeca", series: 4, reps: 20, peso: 20, descanso: 60, tipo: "aislado" } ] },
+            "pull_2": { nombre: "Pull 2", ejercicios: [ { nombre: "Remo con Barra", series: 4, reps: 12, peso: 32, descanso: 120, tipo: "compuesto" }, { nombre: "Remo en Polea Baja", series: 4, reps: 12, peso: 40, descanso: 90, tipo: "compuesto" }, { nombre: "Jalón al Pecho (Supino)", series: 3, reps: 12, peso: 40, descanso: 90, tipo: "compuesto" }, { nombre: "Face Pull (Cuerda)", series: 3, reps: 15, peso: 11, descanso: 75, tipo: "compuesto" }, { nombre: "Curl Martillo", series: 4, reps: 12, peso: 9, descanso: 75, tipo: "compuesto" }, { nombre: "Curl Predicador", series: 3, reps: 12, peso: 7, descanso: 75, tipo: "aislado" }, { nombre: "Flexión de Muñeca", series: 4, reps: 20, peso: 20, descanso: 60, tipo: "aislado" } ] },
+            "legs": { nombre: "Legs", ejercicios: [ { nombre: "Hip Thrust con Barra", series: 4, reps: 12, peso: 30, descanso: 180, tipo: "compuesto" }, { nombre: "Sentadilla Búlgara", series: 3, reps: 12, peso: 14, descanso: 150, tipo: "compuesto" }, { nombre: "Peso Muerto Rumano", series: 4, reps: 12, peso: 32, descanso: 180, tipo: "compuesto" }, { nombre: "Sentadilla Sumo (Barra)", series: 3, reps: 12, peso: 32, descanso: 120, tipo: "compuesto" }, { nombre: "Extensiones en Maquina", series: 3, reps: 15, peso: 22, descanso: 75, tipo: "aislado" }, { nombre: "Curl Femoral en Máquina (De Pie)", series: 3, reps: 12, peso: 11, descanso: 90, tipo: "aislado" } ] },
+            "cadena_anterior": { nombre: "Cadena Anterior", ejercicios: [ { nombre: "Sentadilla Búlgara", series: 3, reps: 12, peso: 14, descanso: 150, tipo: "compuesto" }, { nombre: "Extensiones en Maquina", series: 3, reps: 15, peso: 22, descanso: 75, tipo: "aislado" } ] },
+            "cadena_posterior": { nombre: "Cadena Posterior", ejercicios: [ { nombre: "Hip Thrust con Barra", series: 3, reps: 12, peso: 30, descanso: 150, tipo: "compuesto" }, { nombre: "Curl Femoral en Máquina (De Pie)", series: 3, reps: 12, peso: 11, descanso: 120, tipo: "aislado" } ] },
+            "pantorrillas": { nombre: "Pantorrillas", ejercicios: [ { nombre: "Elevación de Talones de Pie", series: 4, reps: 10, peso: 32, descanso: 90, tipo: "aislado" }, { nombre: "Elevación de Talones Sentado", series: 3, reps: 15, peso: 32, descanso: 60, tipo: "aislado" }, { nombre: "Elevación Tibial", series: 3, reps: 20, peso: 3, descanso: 45, tipo: "aislado" } ] },
+            "core_1": { nombre: "Abdominales", ejercicios: [ { nombre: "Crunch Abdominal Corto", series: 4, reps: 20, peso: 0, descanso: 45, tipo: "aislado" }, { nombre: "Elevación de Piernas", series: 4, reps: 15, peso: 0, descanso: 45, tipo: "aislado" }, { nombre: "Bicycle Crunches", series: 3, reps: 20, peso: 0, descanso: 45, tipo: "aislado" }, { nombre: "Toques a los Talones", series: 3, reps: 20, peso: 0, descanso: 30, tipo: "aislado" } ] }
+        };
+
+        let misRutinas = {}; 
+        const planSemanal = { 1: ["pull_1", "pantorrillas"], 2: ["push_1_1", "cadena_anterior"], 3: ["push_1_2"], 4: [], 5: ["pull_2", "cadena_posterior"], 6: ["push_2", "pantorrillas"], 0: ["legs"] };
+        const nombresDias = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+
+        let estadoActual = { idRutina: null, ejercicioIndex: 0, serieActual: 1, datosRutina: null, volumenAcumulado: 0 };
+        let temporizador; let tiempoRestante = 0; let wakeLock = null; let graficoVolumen = null; let unsubscribeRutinas = null;
+        let temporizadorTotal; let segundosTotales = 0;
+
+        function poblarSelectores() {
+            const selectores = ['selectorRutina', 'editorSelectorRutina'];
+            selectores.forEach(id => {
+                const sel = document.getElementById(id); sel.innerHTML = '';
+                for (const key in misRutinas) { const op = document.createElement('option'); op.value = key; op.text = misRutinas[key].nombre; sel.appendChild(op); }
+            });
+            cargarRutinaDiaria(null); mostrarEjerciciosEditor(); 
+        }
+
+        window.guardarRutinasEnNube = function() { setDoc(doc(db, "usuarios", auth.currentUser.uid), { rutinasCustom: misRutinas }, { merge: true }).catch(e => console.error(e)); }
+
+        // --- AUTH Y FIREBASE ---
+        window.iniciarSesion = function() { const email = document.getElementById('loginEmail').value; const pass = document.getElementById('loginPassword').value; signInWithEmailAndPassword(auth, email, pass).catch(e => { document.getElementById('loginError').style.display = "block"; document.getElementById('loginError').innerText = "Error: " + e.message; }); }
+        window.cerrarSesion = function() { if(confirm("¿Cerrar sesión de Gym Tracker?")) { signOut(auth); } }
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                document.getElementById('vistaLogin').classList.add('oculto'); document.getElementById('appPrincipal').classList.remove('oculto');
+                unsubscribeRutinas = onSnapshot(doc(db, "usuarios", user.uid), (docSnap) => {
+                    if (docSnap.exists() && docSnap.data().rutinasCustom) { misRutinas = docSnap.data().rutinasCustom; } 
+                    else { misRutinas = JSON.parse(JSON.stringify(RUTINAS_DEFAULT)); guardarRutinasEnNube(); }
+                    poblarSelectores();
+                });
+                cargarHistorial(user.uid);
+            } else {
+                if(unsubscribeRutinas) unsubscribeRutinas();
+                document.getElementById('vistaLogin').classList.remove('oculto'); document.getElementById('appPrincipal').classList.add('oculto');
+            }
+        });
+
+        // --- HISTORIAL, GRÁFICOS Y CALENDARIO ---
+        function cargarHistorial(uid) {
+            // Aumentamos el límite para que el calendario tenga datos del mes entero
+            const q = query(collection(db, "usuarios", uid, "historial_gym"), orderBy("fecha", "desc"), limit(50));
+            onSnapshot(q, (snapshot) => {
+                const contenedor = document.getElementById('listaHistorial'); contenedor.innerHTML = '';
+                if(snapshot.empty) { contenedor.innerHTML = '<p style="color:#aaa;">No hay entrenamientos recientes.</p>'; return; }
+                
+                let labelsGrafico = []; let dataGrafico = []; let docs = [];
+                snapshot.forEach(doc => docs.push({ id: doc.id, ...doc.data() }));
+                
+                docs.slice(0, 5).forEach(data => {
+                    const fechaStr = new Date(data.fecha).toLocaleDateString('es-AR', { weekday: 'short', month: 'short', day: 'numeric' });
+                    const volumenCarga = data.volumen ? `${data.volumen} kg` : '--';
+                    const calorias = data.calorias ? `🔥 ${data.calorias} kcal` : '';
+                    
+                    // NUEVO: Agregado botón de eliminar sesión (Cesto de basura)
+                    contenedor.innerHTML += `
+                        <div class="historial-item">
+                            <div class="historial-info" style="flex:1;">
+                                <strong>${data.rutina}</strong>
+                                <p>📅 ${fechaStr} | ⏱️ ${Math.round(data.duracionMinutos)} min <span style="color:var(--alerta); margin-left:5px;">${calorias}</span></p>
+                            </div>
+                            <div style="display:flex; flex-direction:column; align-items:flex-end; gap:5px;">
+                                <button onclick="eliminarHistorial('${data.id}')" style="background:none; border:none; color:var(--peligro); font-size:16px; cursor:pointer;">🗑️</button>
+                                <div class="historial-volumen">${volumenCarga}</div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                docs.slice(0, 15).reverse().forEach(data => {
+                    const fechaCorta = new Date(data.fecha).toLocaleDateString('es-AR', { month: 'short', day: 'numeric' });
+                    labelsGrafico.push(fechaCorta); dataGrafico.push(data.volumen || 0);
+                });
+                
+                renderizarGraficoVolumen(labelsGrafico, dataGrafico);
+                renderizarCalendario(docs);
+            });
+        }
+
+        window.eliminarHistorial = function(docId) {
+            if(confirm("¿Seguro que querés eliminar permanentemente esta sesión de tu registro?")) {
+                deleteDoc(doc(db, "usuarios", auth.currentUser.uid, "historial_gym", docId));
+            }
+        }
+
+        function renderizarCalendario(entrenamientos) {
+            const contenedor = document.getElementById('calendarioDias');
+            contenedor.innerHTML = '';
+            
+            const fecha = new Date();
+            const mesActual = fecha.getMonth();
+            const anioActual = fecha.getFullYear();
+            const primerDiaDelMes = new Date(anioActual, mesActual, 1).getDay(); // 0 = Domingo
+            const diasEnMes = new Date(anioActual, mesActual + 1, 0).getDate();
+
+            // Extraemos los días en que se registró un entrenamiento en este mes
+            const diasEntrenados = entrenamientos
+                .filter(e => new Date(e.fecha).getMonth() === mesActual && new Date(e.fecha).getFullYear() === anioActual)
+                .map(e => new Date(e.fecha).getDate());
+
+            // Rellenar espacios vacíos al inicio del mes
+            for(let i=0; i<primerDiaDelMes; i++) { contenedor.innerHTML += `<div></div>`; }
+
+            for(let i=1; i<=diasEnMes; i++) {
+                let clase = 'dia-cal';
+                if(diasEntrenados.includes(i)) clase += ' entrenado';
+                if(i === fecha.getDate()) clase += ' hoy';
+                contenedor.innerHTML += `<div class="${clase}">${i}</div>`;
+            }
+        }
+
+        function renderizarGraficoVolumen(labels, data) {
+            if(!document.getElementById('chartVolumen')) return;
+            const ctx = document.getElementById('chartVolumen').getContext('2d');
+            if(graficoVolumen) graficoVolumen.destroy();
+            graficoVolumen = new Chart(ctx, { type: 'bar', data: { labels: labels, datasets: [{ label: 'Volumen Total (Kg)', data: data, backgroundColor: '#3498db', borderRadius: 4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { color: '#aaa' }, grid: { color: '#333' } }, x: { ticks: { color: '#aaa' }, grid: { display: false } } } } });
+        }
+
+        // --- EDITOR Y CALENDARIO DINÁMICO ---
+        window.mostrarEjerciciosEditor = function() {
+            const idRutina = document.getElementById('editorSelectorRutina').value;
+            if(!idRutina || !misRutinas[idRutina]) return;
+            const rutina = misRutinas[idRutina]; const contenedor = document.getElementById('listaEjerciciosEditor'); contenedor.innerHTML = '';
+            rutina.ejercicios.forEach((ej, index) => {
+                let btnUp = index > 0 ? `<button class="btn-principal" style="width: auto; padding: 8px; font-size: 14px; background: #555;" onclick="moverEjercicioEditor('${idRutina}', ${index}, -1)">⬆️</button>` : `<div style="width: 38px;"></div>`;
+                let btnDown = index < rutina.ejercicios.length - 1 ? `<button class="btn-principal" style="width: auto; padding: 8px; font-size: 14px; background: #555;" onclick="moverEjercicioEditor('${idRutina}', ${index}, 1)">⬇️</button>` : `<div style="width: 38px;"></div>`;
+                contenedor.innerHTML += `<div class="lista-editor-item"><div style="flex: 1; padding-right: 10px;"><p>${ej.nombre}</p><small>${ej.series}x${ej.reps} | ${ej.peso}kg | ${ej.descanso}s</small></div><div style="display: flex; gap: 5px;">${btnUp}${btnDown}<button class="btn-principal btn-peligro" style="width: auto; padding: 8px; font-size: 14px; margin-left: 5px;" onclick="eliminarEjercicioEditor('${idRutina}', ${index})">✖</button></div></div>`;
+            });
+        }
+        window.moverEjercicioEditor = function(id, index, dir) { const r = misRutinas[id]; if (!r) return; const n = index + dir; if (n < 0 || n >= r.ejercicios.length) return; const temp = r.ejercicios[index]; r.ejercicios[index] = r.ejercicios[n]; r.ejercicios[n] = temp; guardarRutinasEnNube(); mostrarEjerciciosEditor(); }
+        window.eliminarEjercicioEditor = function(id, index) { if(confirm("¿Eliminar este ejercicio?")) { misRutinas[id].ejercicios.splice(index, 1); guardarRutinasEnNube(); } }
+        window.agregarEjercicioEditor = function() {
+            const id = document.getElementById('editorSelectorRutina').value; const nom = document.getElementById('nuevoEjNombre').value.trim(); const ser = parseInt(document.getElementById('nuevoEjSeries').value); const rep = parseInt(document.getElementById('nuevoEjReps').value); const pes = parseInt(document.getElementById('nuevoEjPeso').value); const des = parseInt(document.getElementById('nuevoEjDescanso').value); const tip = document.getElementById('nuevoEjTipo').value;
+            if(!nom || isNaN(ser) || isNaN(rep) || isNaN(pes) || isNaN(des)) { alert("Completá todos los campos."); return; }
+            misRutinas[id].ejercicios.push({ nombre: nom, series: ser, reps: rep, peso: pes, descanso: des, tipo: tip }); guardarRutinasEnNube();
+            document.getElementById('nuevoEjNombre').value=''; document.getElementById('nuevoEjSeries').value=''; document.getElementById('nuevoEjReps').value=''; document.getElementById('nuevoEjPeso').value=''; document.getElementById('nuevoEjDescanso').value=''; alert("¡Agregado!");
+        }
+
+        window.cargarRutinaDiaria = function(diaSeleccionado) {
+            if(Object.keys(misRutinas).length === 0) return; 
+            const diaHoy = new Date().getDay(); const diaActivo = diaSeleccionado !== null ? diaSeleccionado : diaHoy;
+            const contDias = document.getElementById('uiSelectorDias'); contDias.innerHTML = '';
+            nombresDias.forEach((nombre, index) => {
+                let clase = 'dia-btn'; if(index === diaActivo) clase += ' activo';
+                contDias.innerHTML += `<button class="${clase}" onclick="cargarRutinaDiaria(${index})">${nombre.substring(0, 3)}${(index === diaHoy)?' (Hoy)':''}</button>`;
+            });
+            document.getElementById('tituloDiaPlan').innerText = (diaActivo === diaHoy) ? `Rutina de Hoy` : `Rutina del ${nombresDias[diaActivo]}`;
+            const contenedor = document.getElementById('contenedorRutinasHoy'); contenedor.innerHTML = '';
+            const rutinasDelDia = planSemanal[diaActivo];
+            if(rutinasDelDia.length === 0) contenedor.innerHTML = '<p style="color: var(--exito); text-align: center; font-weight: bold;">Día de descanso.</p>';
+            else rutinasDelDia.forEach(id => { const r = misRutinas[id]; if(r) contenedor.innerHTML += `<div class="rutina-hoy-card"><div><strong>${r.nombre}</strong><span>${r.ejercicios.length} ejercicios</span></div><button class="btn-principal btn-exito btn-play-chico" onclick="iniciarRutina('${id}')">▶</button></div>`; });
+        }
+
+        window.cambiarVistaPrincipal = function(vista) {
+            // FIX DEL BUG: Nos aseguramos de ocultar completamente el modo entrenamiento
+            document.getElementById('vistaEstadisticas').classList.add('oculto'); 
+            document.getElementById('vistaSeleccion').classList.add('oculto'); 
+            document.getElementById('vistaEditor').classList.add('oculto');
+            document.getElementById('vistaEntrenamiento').classList.add('oculto');
+            document.getElementById('vistaDescanso').classList.add('oculto');
+            
+            document.getElementById('btnTabEntrenar').classList.remove('activo'); 
+            document.getElementById('btnTabMetricas').classList.remove('activo');
+            document.getElementById('btnTabGestor').classList.remove('activo');
+
+            if(vista === 'entrenar') { document.getElementById('vistaSeleccion').classList.remove('oculto'); document.getElementById('btnTabEntrenar').classList.add('activo'); } 
+            else if (vista === 'metricas') { document.getElementById('vistaEstadisticas').classList.remove('oculto'); document.getElementById('btnTabMetricas').classList.add('activo'); } 
+            else if (vista === 'gestor') { document.getElementById('vistaEditor').classList.remove('oculto'); document.getElementById('btnTabGestor').classList.add('activo'); mostrarEjerciciosEditor(); }
+        }
+
+        // --- MOTOR DEL ENTRENAMIENTO Y SOBRECARGA ---
+        window.iniciarRutina = async function(idRutina) {
+            estadoActual.idRutina = idRutina; estadoActual.datosRutina = misRutinas[idRutina]; estadoActual.ejercicioIndex = 0; estadoActual.serieActual = 1; 
+            estadoActual.horaInicio = Date.now();
+            estadoActual.volumenAcumulado = 0; 
+            
+            try { if ('wakeLock' in navigator) { wakeLock = await navigator.wakeLock.request('screen'); } } catch (err) {}
+            
+            // Cronómetro Total Global
+            segundosTotales = 0;
+            clearInterval(temporizadorTotal);
+            temporizadorTotal = setInterval(() => {
+                segundosTotales++;
+                let m = Math.floor(segundosTotales / 60).toString().padStart(2, '0');
+                let s = (segundosTotales % 60).toString().padStart(2, '0');
+                document.getElementById('uiTiempoTotal').innerText = `⏱️ Tiempo Total: ${m}:${s}`;
+            }, 1000);
+
+            document.getElementById('vistaSeleccion').classList.add('oculto'); document.getElementById('vistaEditor').classList.add('oculto'); document.getElementById('vistaEntrenamiento').classList.remove('oculto');
+            actualizarUIEjercicio(); document.getElementById('navInferior').classList.add('oculto');
+        }
+
+        function actualizarUIEjercicio() {
+            const ejercicio = estadoActual.datosRutina.ejercicios[estadoActual.ejercicioIndex];
+            document.getElementById('uiRutinaNombre').innerText = `${estadoActual.datosRutina.nombre} • Ejercicio ${estadoActual.ejercicioIndex + 1} de ${estadoActual.datosRutina.ejercicios.length}`;
+            document.getElementById('uiEjercicioNombre').innerText = ejercicio.nombre; document.getElementById('uiEjercicioTipo').innerText = ejercicio.tipo; 
+            
+            // Carga pre-llenada en los inputs para la sobrecarga progresiva
+            document.getElementById('uiRepsInput').value = ejercicio.reps; 
+            document.getElementById('uiPesoInput').value = ejercicio.peso;
+
+            const contenedorSeries = document.getElementById('uiSeriesVisuales'); contenedorSeries.innerHTML = '';
+            for(let i=1; i <= ejercicio.series; i++) {
+                let clase = 'bolita-serie';
+                if(i < estadoActual.serieActual) clase += ' completada';
+                if(i === estadoActual.serieActual) clase += ' activa';
+                contenedorSeries.innerHTML += `<div class="${clase}">${i}</div>`;
+            }
+            document.getElementById('btnAccionPrincipal').innerText = `✔️ Completar Serie ${estadoActual.serieActual}`;
+        }
+
+        window.manejarBotonPrincipal = function() {
+            const ejercicio = estadoActual.datosRutina.ejercicios[estadoActual.ejercicioIndex];
+            
+            // Lógica Carga Progresiva: Captura lo que realmente hiciste
+            const repsHechas = parseInt(document.getElementById('uiRepsInput').value) || ejercicio.reps;
+            const pesoUsado = parseFloat(document.getElementById('uiPesoInput').value) || ejercicio.peso;
+            
+            estadoActual.volumenAcumulado += (repsHechas * pesoUsado);
+
+            // Actualizamos la rutina base silenciosamente. La próxima vez, la app recordará tu nuevo PR.
+            if(pesoUsado !== ejercicio.peso || repsHechas !== ejercicio.reps) {
+                ejercicio.peso = pesoUsado;
+                ejercicio.reps = repsHechas;
+                guardarRutinasEnNube();
+            }
+            
+            if (estadoActual.serieActual < ejercicio.series) {
+                estadoActual.serieActual++;
+                iniciarDescanso(ejercicio.descanso, "Descanso entre series", `Preparate para la Serie ${estadoActual.serieActual}`);
+            } else {
+                if (estadoActual.ejercicioIndex < estadoActual.datosRutina.ejercicios.length - 1) {
+                    const tiempoTransicion = ejercicio.descanso + 120;
+                    estadoActual.ejercicioIndex++; estadoActual.serieActual = 1;
+                    const proxEjercicio = estadoActual.datosRutina.ejercicios[estadoActual.ejercicioIndex];
+                    iniciarDescanso(tiempoTransicion, "Transición de Ejercicio", `Acomodá los discos para: ${proxEjercicio.nombre}`);
+                } else {
+                    finalizarRutina();
+                }
+            }
+        }
+
+        function reproducirBeep() {
+            try {
+                const AudioContext = window.AudioContext || window.webkitAudioContext; const ctx = new AudioContext();
+                function hacerPitido(freq, inicio, dur) { const osc = ctx.createOscillator(); const gain = ctx.createGain(); osc.type = 'sine'; osc.frequency.value = freq; osc.connect(gain); gain.connect(ctx.destination); osc.start(ctx.currentTime + inicio); gain.gain.setValueAtTime(1, ctx.currentTime + inicio); gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + inicio + dur); osc.stop(ctx.currentTime + inicio + dur); }
+                hacerPitido(800, 0, 0.2); hacerPitido(800, 0.3, 0.2); hacerPitido(1200, 0.6, 0.5);
+            } catch (e) { }
+        }
+
+        function iniciarDescanso(segundos, titulo, subtitulo) {
+            document.getElementById('vistaEntrenamiento').classList.add('oculto'); document.getElementById('vistaDescanso').classList.remove('oculto');
+            tiempoRestante = segundos; document.getElementById('mensajeDescanso').innerText = titulo; document.getElementById('proximoPasoMensaje').innerText = subtitulo; actualizarRelojUI();
+            clearInterval(temporizador);
+            temporizador = setInterval(() => { tiempoRestante--; actualizarRelojUI(); if (tiempoRestante <= 0) { terminarDescanso(); } }, 1000);
+        }
+        function actualizarRelojUI() { const m = Math.floor(tiempoRestante / 60).toString().padStart(2, '0'); const s = (tiempoRestante % 60).toString().padStart(2, '0'); document.getElementById('relojDisplay').innerText = `${m}:${s}`; }
+        window.sumarTiempo = function(segundos) { tiempoRestante += segundos; actualizarRelojUI(); }
+        window.saltarDescanso = function() { terminarDescanso(); }
+
+        function terminarDescanso() {
+            clearInterval(temporizador); if (navigator.vibrate) { navigator.vibrate([300, 100, 300, 100, 300]); }
+            reproducirBeep();
+            document.getElementById('vistaDescanso').classList.add('oculto'); document.getElementById('vistaEntrenamiento').classList.remove('oculto');
+            actualizarUIEjercicio();
+        }
+
+        async function finalizarRutina() {
+            clearInterval(temporizador); clearInterval(temporizadorTotal);
+            const duracionMin = segundosTotales / 60;
+            
+            // Fórmula termodinámica de calorías (MET * kg * horas)
+            const caloriasQuemadas = Math.round(5.0 * 69 * (duracionMin / 60));
+
+            alert(`¡Entrenamiento Completado! 🏆\nDuración total: ${Math.round(duracionMin)} minutos.\nVolumen movido: ${estadoActual.volumenAcumulado} kg.\nCalorías aprox: ${caloriasQuemadas} kcal.`);
+
+            try {
+                await addDoc(collection(db, "usuarios", auth.currentUser.uid, "historial_gym"), {
+                    rutina: estadoActual.datosRutina.nombre, fecha: Date.now(), duracionMinutos: duracionMin, volumen: estadoActual.volumenAcumulado, calorias: caloriasQuemadas
+                });
+            } catch (e) { console.error(e); }
+
+            if(wakeLock !== null) { wakeLock.release(); wakeLock = null; }
+            document.getElementById('navInferior').classList.remove('oculto');
+            cambiarVistaPrincipal('entrenar'); 
+        }
+
+        window.cancelarRutina = function() {
+            if(confirm("⚠️ ¿Abandonar el entrenamiento a la mitad? Los datos no se guardarán.")) {
+                clearInterval(temporizador); clearInterval(temporizadorTotal);
+                if(wakeLock !== null) { wakeLock.release(); wakeLock = null; }
+                document.getElementById('navInferior').classList.remove('oculto');
+                cambiarVistaPrincipal('entrenar');
+            }
+        }
+    </script>
+    
+    <script>
+        if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('./service-worker.js'); }); }
+    </script>
+</body>
+</html>
