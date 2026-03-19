@@ -8,107 +8,238 @@
     <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#121212">
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
-        /* --- DISEÑO MODO OSCURO --- */
+        /* --- DISEÑO MODO OSCURO PREMIUM (GLASSMORPHISM) --- */
         :root {
-            --fondo: #121212; --tarjeta: #1E1E1E; --texto: #E0E0E0;
-            --primario: #3498db; --exito: #2ECC71; --alerta: #F39C12;
-            --peligro: #E74C3C; --borde: #333333;
+            var(--primario): #007AFF; 
+            --primario-glow: rgba(0, 122, 255, 0.4);
+            --exito: #34C759;
+            --alerta: #FF9F0A;
+            --peligro: #FF453A;
+            
+            --glass-bg: rgba(30, 30, 30, 0.45);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            
+            --texto: #F5F5F7;
+            --texto-secundario: #A1A1A6;
         }
 
         * { box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Roboto, sans-serif; background-color: var(--fondo); color: var(--texto); margin: 0; padding: 15px; padding-bottom: 100px; display: flex; justify-content: center; }
-        .contenedor { max-width: 600px; width: 100%; }
         
-        h1 { text-align: center; color: var(--primario); margin-bottom: 20px; font-size: 24px; text-transform: uppercase; letter-spacing: 1px; }
-        h2 { color: var(--texto); font-size: 18px; border-bottom: 1px solid var(--borde); padding-bottom: 10px; margin-top: 0; }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: linear-gradient(135deg, #0d0d12 0%, #1a1a24 100%);
+            color: var(--texto); 
+            margin: 0; 
+            padding: 15px; 
+            padding-bottom: 100px; 
+            display: flex; 
+            justify-content: center; 
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
 
-        .tarjeta { background-color: var(--tarjeta); border-radius: 12px; padding: 20px; margin-bottom: 20px; border: 1px solid var(--borde); box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        body::before, body::after {
+            content: ''; position: fixed; border-radius: 50%; filter: blur(80px); z-index: -1; opacity: 0.5;
+        }
+        body::before {
+            width: 300px; height: 300px; background: rgba(0, 122, 255, 0.15); top: -50px; left: -100px;
+        }
+        body::after {
+            width: 250px; height: 250px; background: rgba(52, 199, 89, 0.1); bottom: 100px; right: -50px;
+        }
+
+        .contenedor { max-width: 600px; width: 100%; position: relative; z-index: 1; }
         
-        select, input, textarea { width: 100%; padding: 15px; margin-bottom: 15px; background-color: #2C2C2C; color: var(--texto); border: 1px solid var(--borde); border-radius: 8px; font-size: 16px; font-family: inherit; }
+        h1 { text-align: center; color: var(--texto); margin-bottom: 25px; font-size: 28px; font-weight: 800; letter-spacing: -0.5px; }
+        h2 { color: var(--texto); font-size: 18px; font-weight: 600; margin-top: 0; margin-bottom: 15px; }
+
+        .tarjeta { 
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-radius: 20px; 
+            padding: 25px; 
+            margin-bottom: 20px; 
+            border: 1px solid var(--glass-border); 
+            box-shadow: var(--glass-shadow); 
+        }
+        
+        select, input, textarea { 
+            width: 100%; 
+            padding: 16px; 
+            margin-bottom: 15px; 
+            background: rgba(0, 0, 0, 0.2); 
+            color: var(--texto); 
+            border: 1px solid var(--glass-border); 
+            border-radius: 12px; 
+            font-size: 16px; 
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+        select:focus, input:focus, textarea:focus {
+            border-color: #007AFF;
+            box-shadow: 0 0 0 3px var(--primario-glow);
+            background: rgba(0, 0, 0, 0.4);
+        }
         textarea { resize: vertical; min-height: 80px; }
         
-        .btn-principal { width: 100%; padding: 18px; border: none; border-radius: 10px; font-size: 18px; font-weight: bold; color: white; background-color: var(--primario); cursor: pointer; transition: 0.2s; display: flex; justify-content: center; align-items: center; gap: 10px; }
-        .btn-principal:active { transform: scale(0.98); opacity: 0.8; }
-        .btn-exito { background-color: var(--exito); }
-        .btn-peligro { background-color: var(--peligro); }
-        .btn-alerta { background-color: var(--alerta); }
-
-        /* --- UI DEL ENTRENAMIENTO ACTIVO --- */
-        .ejercicio-header { text-align: center; margin-bottom: 20px; }
-        .ejercicio-titulo { font-size: 22px; color: var(--primario); font-weight: bold; margin: 0 0 5px 0; }
-        .ejercicio-tipo { font-size: 12px; text-transform: uppercase; background: #333; padding: 4px 10px; border-radius: 12px; display: inline-block; color: #aaa; }
+        .btn-principal { 
+            width: 100%; 
+            padding: 18px; 
+            border: none; 
+            border-radius: 14px; 
+            font-size: 16px; 
+            font-weight: 600; 
+            letter-spacing: 0.5px;
+            color: white; 
+            background: linear-gradient(135deg, #007AFF, #0056b3);
+            box-shadow: 0 4px 15px var(--primario-glow);
+            cursor: pointer; 
+            transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1); 
+            display: flex; justify-content: center; align-items: center; gap: 10px; 
+        }
+        .btn-principal:hover { filter: brightness(1.1); transform: translateY(-2px); }
+        .btn-principal:active { transform: translateY(1px) scale(0.98); opacity: 0.9; }
         
-        .grid-datos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 25px; }
-        .dato-caja { background: #2C2C2C; padding: 10px; border-radius: 10px; text-align: center; border: 1px solid #444; }
-        .dato-caja span { display: block; font-size: 11px; color: #aaa; text-transform: uppercase; margin-bottom: 8px; }
+        .btn-exito { background: linear-gradient(135deg, var(--exito), #248A3D); box-shadow: 0 4px 15px rgba(52, 199, 89, 0.3); }
+        .btn-peligro { background: linear-gradient(135deg, var(--peligro), #C1352A); box-shadow: 0 4px 15px rgba(255, 69, 58, 0.3); }
+        .btn-alerta { background: linear-gradient(135deg, var(--alerta), #B87308); box-shadow: 0 4px 15px rgba(255, 159, 10, 0.3); }
+
+        .ejercicio-header { text-align: center; margin-bottom: 25px; }
+        .ejercicio-titulo { font-size: 26px; color: white; font-weight: 800; margin: 0 0 8px 0; letter-spacing: -0.5px;}
+        .ejercicio-tipo { font-size: 11px; font-weight: 800; text-transform: uppercase; background: rgba(255,255,255,0.1); padding: 6px 12px; border-radius: 20px; display: inline-block; color: #007AFF; border: 1px solid var(--glass-border);}
         
-        .input-progreso { background: transparent; border: none; color: white; font-size: 22px; font-weight: bold; text-align: center; padding: 0; margin: 0; width: 100%; }
-        .input-progreso:focus { outline: none; border-bottom: 2px solid var(--primario); }
-        select.input-progreso { appearance: none; -webkit-appearance: none; cursor: pointer; font-size: 16px;}
+        .grid-datos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 30px; }
+        .dato-caja { background: rgba(0, 0, 0, 0.2); padding: 15px 10px; border-radius: 16px; text-align: center; border: 1px solid var(--glass-border); }
+        .dato-caja span { display: block; font-size: 11px; font-weight: 600; color: var(--texto-secundario); text-transform: uppercase; margin-bottom: 10px; }
+        
+        .input-progreso { background: transparent; border: none; color: white; font-size: 26px; font-weight: 800; text-align: center; padding: 0; margin: 0; width: 100%; }
+        .input-progreso:focus { outline: none; border-bottom: 2px solid #007AFF; border-radius: 0; background: transparent; box-shadow: none; }
+        select.input-progreso { appearance: none; -webkit-appearance: none; cursor: pointer; font-size: 16px; font-weight: 600;}
 
-        .progreso-series { display: flex; justify-content: center; gap: 8px; margin-bottom: 25px; flex-wrap: wrap; }
-        .bolita-serie { width: 25px; height: 25px; border-radius: 50%; background-color: #333; border: 2px solid #555; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; }
-        .bolita-serie.activa { background-color: var(--alerta); border-color: var(--alerta); color: black; }
-        .bolita-serie.completada { background-color: var(--exito); border-color: var(--exito); color: black; }
+        .progreso-series { display: flex; justify-content: center; gap: 10px; margin-bottom: 30px; flex-wrap: wrap; }
+        .bolita-serie { width: 32px; height: 32px; border-radius: 50%; background-color: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; color: var(--texto-secundario); transition: all 0.3s ease; }
+        .bolita-serie.activa { background-color: var(--alerta); border-color: var(--alerta); color: #000; box-shadow: 0 0 15px rgba(255, 159, 10, 0.4); transform: scale(1.1); }
+        .bolita-serie.completada { background-color: var(--exito); border-color: var(--exito); color: #000; }
 
-        /* --- RELOJ GIGANTE --- */
-        .reloj-contenedor { text-align: center; margin: 30px 0; }
-        .reloj-display { font-size: 80px; font-weight: bold; font-family: monospace; color: var(--alerta); text-shadow: 0 0 10px rgba(243, 156, 18, 0.3); }
-        .reloj-mensaje { color: #aaa; font-size: 16px; margin-bottom: 10px; }
+        .reloj-contenedor { text-align: center; margin: 40px 0; }
+        .reloj-display { font-size: 85px; font-weight: 300; font-family: 'Inter', sans-serif; letter-spacing: -2px; color: white; text-shadow: 0 0 20px rgba(255, 255, 255, 0.2); }
+        .reloj-mensaje { color: #007AFF; font-size: 18px; font-weight: 600; margin-bottom: 10px; }
 
         .oculto { display: none !important; }
         
-        .historial-item { border-left: 4px solid var(--exito); background: #252525; padding: 15px; margin-bottom: 10px; border-radius: 0 8px 8px 0; display: flex; justify-content: space-between; align-items: center; }
-        .historial-info p { margin: 5px 0 0 0; font-size: 12px; color: #aaa; }
-        .historial-volumen { font-size: 15px; font-weight: bold; color: var(--primario); text-align: right; }
-        .historial-nota { font-size: 11px; color: #888; margin-top: 5px; font-style: italic; }
+        .historial-item { background: rgba(0,0,0,0.2); padding: 18px; margin-bottom: 12px; border-radius: 16px; border: 1px solid var(--glass-border); display: flex; justify-content: space-between; align-items: center; position: relative; overflow: hidden; }
+        .historial-item::before { content: ''; position: absolute; left: 0; top: 0; height: 100%; width: 4px; background: var(--exito); }
+        .historial-info p { margin: 6px 0 0 0; font-size: 13px; color: var(--texto-secundario); }
+        .historial-volumen { font-size: 16px; font-weight: 800; color: #007AFF; text-align: right; }
+        .historial-nota { font-size: 12px; color: #888; margin-top: 8px; font-style: italic; background: rgba(255,255,255,0.03); padding: 6px 10px; border-radius: 8px; }
 
-        /* --- SELECTOR DE DÍAS Y RUTINA DIARIA --- */
-        .dias-selector { display: flex; gap: 8px; overflow-x: auto; margin-bottom: 20px; padding-bottom: 5px; scrollbar-width: none; }
+        .dias-selector { display: flex; gap: 10px; overflow-x: auto; margin-bottom: 25px; padding-bottom: 10px; scrollbar-width: none; }
         .dias-selector::-webkit-scrollbar { display: none; }
-        .dia-btn { flex: 0 0 auto; background: #252525; border: 1px solid var(--borde); color: #aaa; padding: 8px 15px; border-radius: 20px; font-size: 13px; font-weight: bold; cursor: pointer; transition: 0.2s; }
-        .dia-btn.activo { background: var(--primario); color: white; border-color: var(--primario); }
+        .dia-btn { flex: 0 0 auto; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: var(--texto-secundario); padding: 10px 18px; border-radius: 20px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; font-family: 'Inter', sans-serif; }
+        .dia-btn.activo { background: #007AFF; color: white; border-color: #007AFF; box-shadow: 0 4px 12px var(--primario-glow); }
         
-        .rutina-hoy-card { background: #252525; padding: 15px; border-radius: 8px; margin-bottom: 12px; border-left: 4px solid var(--exito); display: flex; justify-content: space-between; align-items: center; }
-        .rutina-hoy-card strong { display: block; font-size: 16px; color: white; }
-        .rutina-hoy-card span { font-size: 12px; color: #aaa; }
-        .btn-play-chico { width: auto; padding: 10px 20px; font-size: 14px; border-radius: 8px; }
-        details summary { padding: 10px; background: #252525; border-radius: 8px; cursor: pointer; font-weight: bold; color: #aaa; border: 1px solid var(--borde); }
+        .rutina-hoy-card { background: rgba(0,0,0,0.2); padding: 18px; border-radius: 16px; margin-bottom: 12px; border: 1px solid var(--glass-border); display: flex; justify-content: space-between; align-items: center; position: relative; overflow: hidden;}
+        .rutina-hoy-card::before { content: ''; position: absolute; left: 0; top: 0; height: 100%; width: 4px; background: #007AFF; }
+        .rutina-hoy-card strong { display: block; font-size: 17px; font-weight: 600; color: white; margin-bottom: 4px;}
+        .rutina-hoy-card span { font-size: 13px; color: var(--texto-secundario); }
+        .btn-play-chico { width: 45px; height: 45px; padding: 0; border-radius: 50%; font-size: 18px; display: flex; align-items: center; justify-content: center; }
+        
+        details summary { padding: 15px; background: rgba(0,0,0,0.2); border-radius: 12px; cursor: pointer; font-weight: 600; color: var(--texto); border: 1px solid var(--glass-border); list-style: none; display: flex; justify-content: space-between; align-items: center;}
+        details summary::after { content: '+'; font-size: 20px; color: #007AFF; }
+        details[open] summary::after { content: '-'; }
 
-        /* --- EDITOR Y CALENDARIO --- */
-        .lista-editor-item { background: #252525; padding: 12px; border-radius: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border-left: 3px solid var(--primario); }
-        .lista-editor-item p { margin: 0 0 4px 0; font-size: 15px; font-weight: bold; }
-        .lista-editor-item small { color: #aaa; font-size: 12px; }
-        .form-fila { display: flex; gap: 10px; }
+        .lista-editor-item { background: rgba(0,0,0,0.2); padding: 15px; border-radius: 14px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--glass-border); }
+        .lista-editor-item p { margin: 0 0 6px 0; font-size: 15px; font-weight: 600; }
+        .lista-editor-item small { color: var(--texto-secundario); font-size: 12px; background: rgba(255,255,255,0.05); padding: 4px 8px; border-radius: 6px;}
+        .form-fila { display: flex; gap: 12px; }
         .form-fila input { flex: 1; }
 
-        .calendario-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; text-align: center; margin-bottom: 15px; }
-        .dia-cal { background: #252525; padding: 8px 0; border-radius: 6px; font-size: 13px; color: #7f8c8d; }
-        .dia-cal.entrenado { background: var(--primario); color: white; font-weight: bold; border: 1px solid #5DADE2; }
-        .dia-cal.hoy { border: 2px solid var(--alerta); color: white; }
-        .dia-nombre { font-size: 11px; text-transform: uppercase; color: #666; font-weight: bold; margin-bottom: 5px; }
+        .calendario-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; text-align: center; margin-bottom: 15px; }
+        .dia-cal { background: rgba(0,0,0,0.2); padding: 10px 0; border-radius: 10px; font-size: 14px; font-weight: 600; color: var(--texto-secundario); border: 1px solid transparent; }
+        .dia-cal.entrenado { background: rgba(52, 199, 89, 0.15); color: var(--exito); border-color: rgba(52, 199, 89, 0.3); }
+        .dia-cal.hoy { border: 2px solid #007AFF; color: white; }
+        .dia-nombre { font-size: 11px; text-transform: uppercase; color: var(--texto-secundario); font-weight: 800; margin-bottom: 8px; letter-spacing: 1px;}
 
-        /* --- MODAL (POPUP) FATIGA --- */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: flex; justify-content: center; align-items: center; z-index: 2000; padding: 20px; backdrop-filter: blur(5px); }
-        .modal-content { background: var(--tarjeta); padding: 25px; border-radius: 16px; width: 100%; max-width: 400px; border: 1px solid var(--borde); box-shadow: 0 10px 25px rgba(0,0,0,0.5); text-align: center; }
-        .btn-emoji { font-size: 30px; background: #2C2C2C; border: 1px solid #444; border-radius: 12px; padding: 15px; flex: 1; cursor: pointer; transition: 0.2s; }
-        .btn-emoji:active { transform: scale(0.9); }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center; z-index: 2000; padding: 20px; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+        .modal-content { background: var(--glass-bg); padding: 30px; border-radius: 24px; width: 100%; max-width: 400px; border: 1px solid var(--glass-border); box-shadow: 0 20px 40px rgba(0,0,0,0.5); text-align: center; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);}
+        .btn-emoji { font-size: 35px; background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); border-radius: 16px; padding: 15px; flex: 1; cursor: pointer; transition: all 0.2s; }
+        .btn-emoji:hover { background: rgba(255,255,255,0.05); transform: translateY(-3px); }
+        .btn-emoji:active { transform: scale(0.95); }
 
-        /* --- NAVEGACIÓN INFERIOR --- */
-        .navegacion { position: fixed; bottom: 0; left: 0; width: 100%; background-color: var(--tarjeta); box-shadow: 0 -2px 10px rgba(0,0,0,0.5); display: flex; justify-content: space-around; padding: 8px 0 15px 0; z-index: 1000; border-radius: 16px 16px 0 0; border-top: 1px solid var(--borde); }
-        .tab-btn { flex: 1; display: flex; flex-direction: column; align-items: center; background: none; border: none; font-size: 11px; font-weight: 600; color: #aaa; cursor: pointer; transition: 0.2s; }
-        .tab-btn i { font-size: 22px; margin-bottom: 4px; font-style: normal; transition: 0.2s; filter: grayscale(100%); opacity: 0.6; }
-        .tab-btn.activo { color: var(--primario); }
-        .tab-btn.activo i { filter: grayscale(0%); opacity: 1; transform: scale(1.1); }
+        .navegacion { 
+            position: fixed; 
+            bottom: 0; left: 0; width: 100%; 
+            background: rgba(25, 25, 30, 0.7); 
+            backdrop-filter: blur(20px); 
+            -webkit-backdrop-filter: blur(20px);
+            display: flex; justify-content: space-around; 
+            padding: 12px 0 25px 0; 
+            z-index: 1000; 
+            border-top: 1px solid var(--glass-border); 
+        }
+        .tab-btn { flex: 1; display: flex; flex-direction: column; align-items: center; background: none; border: none; font-size: 11px; font-weight: 600; font-family: 'Inter', sans-serif; color: var(--texto-secundario); cursor: pointer; transition: 0.3s; }
+        .tab-btn i { font-size: 24px; margin-bottom: 6px; font-style: normal; transition: 0.3s; opacity: 0.5; filter: grayscale(100%); }
+        .tab-btn.activo { color: #007AFF; }
+        .tab-btn.activo i { opacity: 1; filter: grayscale(0%); transform: translateY(-3px); }
 
-        .grafico-contenedor { position: relative; height: 250px; width: 100%; margin-top: 20px; }
+        .grafico-contenedor { position: relative; height: 250px; width: 100%; margin-top: 25px; }
         
-        /* SCORE DORADO V-TAPER */
-        .vtaper-card { background: linear-gradient(135deg, #f39c12 0%, #d35400 100%); color: white; padding: 15px; border-radius: 12px; text-align: center; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(243, 156, 18, 0.2); }
-        .vtaper-card strong { font-size: 36px; display: block; margin: 5px 0; }
+        .vtaper-card { 
+            background: linear-gradient(135deg, rgba(243, 156, 18, 0.2) 0%, rgba(211, 84, 0, 0.2) 100%); 
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(243, 156, 18, 0.3);
+            color: white; 
+            padding: 25px; 
+            border-radius: 20px; 
+            text-align: center; 
+            margin-bottom: 25px; 
+            box-shadow: 0 10px 30px rgba(243, 156, 18, 0.1); 
+            position: relative;
+            overflow: hidden;
+        }
+        .vtaper-card::after {
+            content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.1), transparent);
+            transform: skewX(-20deg); animation: brillo 3s infinite;
+        }
+        @keyframes brillo { 0% { left: -100%; } 20% { left: 200%; } 100% { left: 200%; } }
+        .vtaper-card strong { font-size: 42px; font-weight: 800; display: block; margin: 10px 0; color: #F39C12; text-shadow: 0 0 15px rgba(243, 156, 18, 0.4);}
+
+        /* --- NUEVO: MICROINTERACCIONES --- */
+        @keyframes pulso-exito {
+            0% { box-shadow: 0 0 0 0 rgba(52, 199, 89, 0.7); transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { box-shadow: 0 0 0 15px rgba(52, 199, 89, 0); transform: scale(1); }
+        }
+        
+        .animar-exito {
+            animation: pulso-exito 0.4s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+            background: var(--exito) !important;
+            color: black !important;
+            border-color: var(--exito) !important;
+        }
+
+        @keyframes sacudon {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-5px); }
+            40%, 80% { transform: translateX(5px); }
+        }
+        
+        .animar-error {
+            animation: sacudon 0.4s ease;
+            border-color: var(--peligro) !important;
+        }
     </style>
 </head>
 <body>
@@ -130,7 +261,7 @@
                 <div class="tarjeta">
                     <h2>Empezar Entrenamiento</h2>
                     <div class="dias-selector" id="uiSelectorDias"></div>
-                    <h2 id="tituloDiaPlan" style="color: var(--primario); font-size: 18px; border:none; padding:0;">Rutina de Hoy</h2>
+                    <h2 id="tituloDiaPlan" style="color: #007AFF; font-size: 18px; border:none; padding:0;">Rutina de Hoy</h2>
                     <div id="contenedorRutinasHoy" style="margin-top: 15px;"></div>
 
                     <details style="margin-top: 20px;">
@@ -151,7 +282,7 @@
             <div id="vistaEditor" class="oculto">
                 <div class="tarjeta">
                     <h2>Modificar Rutina</h2>
-                    <p style="font-size: 12px; color: #aaa; margin-top: -10px; margin-bottom: 15px;">Agregá, eliminá o reordená tus ejercicios.</p>
+                    <p style="font-size: 12px; color: var(--texto-secundario); margin-top: -10px; margin-bottom: 15px;">Agregá, eliminá o reordená tus ejercicios.</p>
                     <select id="editorSelectorRutina" onchange="mostrarEjerciciosEditor()"></select>
                     <div id="listaEjerciciosEditor" style="margin-top: 15px;"></div>
                 </div>
@@ -194,7 +325,7 @@
 
                 <div class="tarjeta">
                     <h2>Volumen de Carga Efectiva</h2>
-                    <p style="font-size: 12px; color: #aaa; margin-top: -10px;">Tonelaje. Excluye series de Calentamiento.</p>
+                    <p style="font-size: 12px; color: var(--texto-secundario); margin-top: -10px;">Tonelaje. Excluye series de Calentamiento.</p>
                     <div class="grafico-contenedor">
                         <canvas id="chartVolumen"></canvas>
                     </div>
@@ -204,12 +335,12 @@
             <div id="vistaPerfil" class="oculto">
                 <div class="tarjeta">
                     <h2>👤 Mi Perfil Biométrico</h2>
-                    <p style="font-size: 13px; color: #aaa; margin-top: -10px; margin-bottom: 15px;">Mantené tu peso y medidas actualizados para mejorar las métricas.</p>
+                    <p style="font-size: 13px; color: var(--texto-secundario); margin-top: -10px; margin-bottom: 15px;">Mantené tu peso y medidas actualizados para mejorar las métricas.</p>
                     
-                    <label style="font-size: 12px; color: #aaa; font-weight: bold;">Peso Corporal (Termodinámica)</label>
+                    <label style="font-size: 12px; color: var(--texto-secundario); font-weight: bold;">Peso Corporal (Termodinámica)</label>
                     <input type="number" id="inputPesoCorporal" placeholder="Tu peso actual (kg)" step="0.1">
                     
-                    <label style="font-size: 12px; color: #aaa; font-weight: bold; margin-top: 10px;">Medidas (Para V-Taper)</label>
+                    <label style="font-size: 12px; color: var(--texto-secundario); font-weight: bold; margin-top: 10px;">Medidas (Para V-Taper)</label>
                     <div class="form-fila">
                         <input type="number" id="inputHombros" placeholder="Hombros/Espalda (cm)" step="0.1">
                         <input type="number" id="inputCintura" placeholder="Cintura (cm)" step="0.1">
@@ -218,18 +349,18 @@
                     <button class="btn-principal" onclick="guardarPerfil()">Guardar Perfil</button>
                 </div>
 
-                <button class="btn-principal btn-peligro" style="background: transparent; border: 1px solid var(--peligro); margin-top: 20px;" onclick="cerrarSesion()">🚪 Cerrar Sesión</button>
+                <button class="btn-principal btn-peligro" style="background: transparent; border: 1px solid var(--peligro); box-shadow: none; margin-top: 20px;" onclick="cerrarSesion()">🚪 Cerrar Sesión</button>
             </div>
 
             <div id="vistaEntrenamiento" class="oculto">
                 <div class="tarjeta">
                     
-                    <div id="uiTiempoTotal" style="text-align:center; color: #aaa; font-family: monospace; font-size: 16px; margin-bottom: 10px;">
+                    <div id="uiTiempoTotal" style="text-align:center; color: var(--texto-secundario); font-family: monospace; font-size: 16px; margin-bottom: 10px;">
                         ⏱️ Tiempo Total: 00:00
                     </div>
 
                     <div class="ejercicio-header">
-                        <p id="uiRutinaNombre" style="color: #aaa; font-size: 12px; margin: 0 0 10px 0; text-transform: uppercase;">Push 1.1</p>
+                        <p id="uiRutinaNombre" style="color: var(--texto-secundario); font-size: 12px; margin: 0 0 10px 0; text-transform: uppercase;">Push 1.1</p>
                         <h2 id="uiEjercicioNombre" class="ejercicio-titulo">Press Inclinado</h2>
                         <span id="uiEjercicioTipo" class="ejercicio-tipo">Compuesto</span>
                     </div>
@@ -258,7 +389,7 @@
                         ✔️ Completar Serie
                     </button>
                     
-                    <button class="btn-principal btn-peligro" style="margin-top: 20px; background: transparent; border: 1px solid var(--peligro);" onclick="cancelarRutina()">
+                    <button class="btn-principal btn-peligro" style="margin-top: 20px; background: transparent; border: 1px solid var(--peligro); box-shadow: none;" onclick="cancelarRutina()">
                         ⏹ Cancelar Entrenamiento
                     </button>
                 </div>
@@ -271,8 +402,8 @@
                         <div id="relojDisplay" class="reloj-display">00:00</div>
                     </div>
                     
-                    <div style="background: #252525; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid var(--primario);">
-                        <span style="font-size: 12px; color: #aaa; text-transform: uppercase;">Preparate para:</span>
+                    <div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 12px; margin-bottom: 20px; border-left: 4px solid #007AFF;">
+                        <span style="font-size: 12px; color: var(--texto-secundario); text-transform: uppercase;">Preparate para:</span>
                         <p id="proximoPasoMensaje" style="margin: 5px 0 0 0; font-weight: bold; font-size: 16px;">Siguiente Serie</p>
                     </div>
 
@@ -285,8 +416,8 @@
 
             <div id="modalFatiga" class="modal-overlay oculto">
                 <div class="modal-content">
-                    <h2 style="color: var(--primario); margin-top: 0;">¡Entrenamiento Listo!</h2>
-                    <p style="font-size: 14px; color: #aaa;">Antes de guardar, ¿cómo te sentiste a nivel SNC y energía general?</p>
+                    <h2 style="color: #007AFF; margin-top: 0;">¡Entrenamiento Listo!</h2>
+                    <p style="font-size: 14px; color: var(--texto-secundario);">Antes de guardar, ¿cómo te sentiste a nivel SNC y energía general?</p>
                     
                     <div style="display: flex; gap: 10px; margin-bottom: 20px;">
                         <button class="btn-emoji" onclick="guardarFatigaYFinalizar('😫 Agotado')" title="Agotado / Mal dormido">😫</button>
@@ -322,19 +453,19 @@
         import { getFirestore, doc, setDoc, collection, addDoc, query, orderBy, limit, onSnapshot, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         const firebaseConfig = {
-    		apiKey: "AIzaSyDYNhDmk3lT6ol7FjFPb3Cv121SdQQU6eU",
-    		authDomain: "app-entrenamiento-daf51.firebaseapp.com",
-    		projectId: "app-entrenamiento-daf51",
-    		storageBucket: "app-entrenamiento-daf51.firebasestorage.app",
-    		messagingSenderId: "259599764141",
-    		appId: "1:259599764141:web:8d2841d173b33ba1455424"
- 	};
+            apiKey: "AIzaSyDYNhDmk3lT6ol7FjFPb3Cv121SdQQU6eU",
+            authDomain: "app-entrenamiento-daf51.firebaseapp.com",
+            projectId: "app-entrenamiento-daf51",
+            storageBucket: "app-entrenamiento-daf51.firebasestorage.app",
+            messagingSenderId: "259599764141",
+            appId: "1:259599764141:web:8d2841d173b33ba1455424"
+        };
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // --- RUTINAS POR DEFECTO ---
+        // --- RUTINAS POR DEFECTO (Recortado visualmente para claridad) ---
         const RUTINAS_DEFAULT = {
             "push_1_1": { nombre: "Push 1.1 (Pecho y Triceps)", ejercicios: [ { nombre: "Press Inclinado (Barra)", series: 4, reps: 15, peso: 36, descanso: 120, tipo: "compuesto" }, { nombre: "Press Plano (Barra)", series: 4, reps: 15, peso: 36, descanso: 120, tipo: "compuesto" }, { nombre: "Aperturas (Dumbbell Fly)", series: 3, reps: 12, peso: 20, descanso: 90, tipo: "aislado" }, { nombre: "Press Frances (Barra)", series: 3, reps: 12, peso: 15, descanso: 90, tipo: "aislado" }, { nombre: "Extensión Tríceps (Cuerda)", series: 3, reps: 12, peso: 11, descanso: 75, tipo: "aislado" } ] },
             "push_1_2": { nombre: "Push 1.2 (Hombros)", ejercicios: [ { nombre: "Elevaciones Laterales (Mancuernas)", series: 4, reps: 15, peso: 7, descanso: 75, tipo: "aislado" }, { nombre: "Press Militar Sentado", series: 4, reps: 10, peso: 15, descanso: 90, tipo: "compuesto" }, { nombre: "Elevaciones Laterales (Inclinado)", series: 3, reps: 15, peso: 8, descanso: 75, tipo: "aislado" }, { nombre: "Press Arnold", series: 4, reps: 12, peso: 12, descanso: 90, tipo: "compuesto" } ] },
@@ -355,8 +486,43 @@
         let estadoActual = { idRutina: null, ejercicioIndex: 0, serieActual: 1, datosRutina: null, volumenAcumulado: 0 };
         let temporizador; let tiempoRestante = 0; let wakeLock = null; let graficoVolumen = null; let unsubscribeRutinas = null;
         let temporizadorTotal; let segundosTotales = 0;
+        let marcaTiempoFinDescanso = 0; // NUEVO: Para el reloj anti-suspensión
         
         let pesoCorporalUsuario = 69;
+
+        // --- NUEVO: SISTEMA HÁPTICO Y NOTIFICACIONES ---
+        document.addEventListener('DOMContentLoaded', () => {
+            if ("Notification" in window && Notification.permission !== "granted" && Notification.permission !== "denied") {
+                Notification.requestPermission();
+            }
+        });
+
+        function vibrar(tipo) {
+            if (!navigator.vibrate) return;
+            switch(tipo) {
+                case 'click': navigator.vibrate(30); break;
+                case 'exito': navigator.vibrate([80, 40, 80]); break;
+                case 'alarma': navigator.vibrate([400, 200, 400, 200, 400]); break;
+                case 'error': navigator.vibrate([50, 50, 50, 50, 50]); break;
+            }
+        }
+
+        function lanzarNotificacionLocal(titulo, cuerpo) {
+            if ("Notification" in window && Notification.permission === "granted") {
+                if (document.hidden) {
+                    navigator.serviceWorker.ready.then(registration => {
+                        registration.showNotification(titulo, {
+                            body: cuerpo,
+                            icon: './manifest-icon-192.maskable.png',
+                            badge: './manifest-icon-192.maskable.png',
+                            vibrate: [400, 200, 400],
+                            tag: 'gym-descanso',
+                            renotify: true
+                        });
+                    });
+                }
+            }
+        }
 
         function poblarSelectores() {
             const selectores = ['selectorRutina', 'editorSelectorRutina'];
@@ -369,7 +535,6 @@
 
         window.guardarRutinasEnNube = function() { setDoc(doc(db, "usuarios", auth.currentUser.uid), { rutinasCustom: misRutinas }, { merge: true }).catch(e => console.error(e)); }
         
-        // --- GUARDADO DE PERFIL Y V-TAPER ---
         window.guardarPerfil = function() {
             const nuevoPeso = parseFloat(document.getElementById('inputPesoCorporal').value);
             const hombros = parseFloat(document.getElementById('inputHombros').value);
@@ -387,7 +552,6 @@
             }).catch(e => console.error(e));
         }
 
-        // --- AUTH Y FIREBASE ---
         window.iniciarSesion = function() { const email = document.getElementById('loginEmail').value; const pass = document.getElementById('loginPassword').value; signInWithEmailAndPassword(auth, email, pass).catch(e => { document.getElementById('loginError').style.display = "block"; document.getElementById('loginError').innerText = "Error: " + e.message; }); }
         window.cerrarSesion = function() { if(confirm("¿Cerrar sesión de Gym Tracker?")) { signOut(auth); } }
 
@@ -400,7 +564,6 @@
                         if(data.rutinasCustom) { misRutinas = data.rutinasCustom; } else { misRutinas = JSON.parse(JSON.stringify(RUTINAS_DEFAULT)); guardarRutinasEnNube(); }
                         if(data.pesoCorporal) { pesoCorporalUsuario = data.pesoCorporal; document.getElementById('inputPesoCorporal').value = pesoCorporalUsuario; }
                         
-                        // Render V-TAPER
                         if(data.hombros) document.getElementById('inputHombros').value = data.hombros;
                         if(data.cintura) document.getElementById('inputCintura').value = data.cintura;
                         if(data.hombros && data.cintura) {
@@ -420,12 +583,11 @@
             }
         });
 
-        // --- HISTORIAL, GRÁFICOS Y CALENDARIO ---
         function cargarHistorial(uid) {
             const q = query(collection(db, "usuarios", uid, "historial_gym"), orderBy("fecha", "desc"), limit(50));
             onSnapshot(q, (snapshot) => {
                 const contenedor = document.getElementById('listaHistorial'); contenedor.innerHTML = '';
-                if(snapshot.empty) { contenedor.innerHTML = '<p style="color:#aaa;">No hay entrenamientos recientes.</p>'; return; }
+                if(snapshot.empty) { contenedor.innerHTML = '<p style="color:var(--texto-secundario);">No hay entrenamientos recientes.</p>'; return; }
                 
                 let labelsGrafico = []; let dataGrafico = []; let docs = [];
                 snapshot.forEach(doc => docs.push({ id: doc.id, ...doc.data() }));
@@ -435,7 +597,6 @@
                     const volumenCarga = data.volumen ? `${data.volumen} kg` : '--';
                     const calorias = data.calorias ? `🔥 ${data.calorias} kcal` : '';
                     
-                    // Verificamos si hay nota de fatiga o de texto
                     let htmlNota = '';
                     if(data.fatiga || data.notas) {
                         const iconFatiga = data.fatiga ? data.fatiga : '';
@@ -446,7 +607,7 @@
                     contenedor.innerHTML += `
                         <div class="historial-item">
                             <div class="historial-info" style="flex:1;">
-                                <strong style="font-size:14px;">${data.rutina}</strong>
+                                <strong style="font-size:15px; color:white;">${data.rutina}</strong>
                                 <p>📅 ${fechaStr} | ⏱️ ${Math.round(data.duracionMinutos)} min <span style="color:var(--alerta); margin-left:5px;">${calorias}</span></p>
                                 ${htmlNota}
                             </div>
@@ -497,18 +658,46 @@
             if(!document.getElementById('chartVolumen')) return;
             const ctx = document.getElementById('chartVolumen').getContext('2d');
             if(graficoVolumen) graficoVolumen.destroy();
-            graficoVolumen = new Chart(ctx, { type: 'bar', data: { labels: labels, datasets: [{ label: 'Volumen Efectivo (Kg)', data: data, backgroundColor: '#3498db', borderRadius: 4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { color: '#aaa' }, grid: { color: '#333' } }, x: { ticks: { color: '#aaa' }, grid: { display: false } } } } });
+            graficoVolumen = new Chart(ctx, { 
+                type: 'bar', 
+                data: { 
+                    labels: labels, 
+                    datasets: [{ 
+                        label: 'Volumen Efectivo (Kg)', 
+                        data: data, 
+                        backgroundColor: 'rgba(0, 122, 255, 0.7)', 
+                        borderColor: '#007AFF',
+                        borderWidth: 1,
+                        borderRadius: 6 
+                    }] 
+                }, 
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false, 
+                    plugins: { legend: { display: false } }, 
+                    scales: { 
+                        y: { 
+                            beginAtZero: true, 
+                            ticks: { color: '#A1A1A6' }, 
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' } 
+                        }, 
+                        x: { 
+                            ticks: { color: '#A1A1A6' }, 
+                            grid: { display: false } 
+                        } 
+                    } 
+                } 
+            });
         }
 
-        // --- EDITOR Y CALENDARIO DINÁMICO ---
         window.mostrarEjerciciosEditor = function() {
             const idRutina = document.getElementById('editorSelectorRutina').value;
             if(!idRutina || !misRutinas[idRutina]) return;
             const rutina = misRutinas[idRutina]; const contenedor = document.getElementById('listaEjerciciosEditor'); contenedor.innerHTML = '';
             rutina.ejercicios.forEach((ej, index) => {
-                let btnUp = index > 0 ? `<button class="btn-principal" style="width: auto; padding: 8px; font-size: 14px; background: #555;" onclick="moverEjercicioEditor('${idRutina}', ${index}, -1)">⬆️</button>` : `<div style="width: 38px;"></div>`;
-                let btnDown = index < rutina.ejercicios.length - 1 ? `<button class="btn-principal" style="width: auto; padding: 8px; font-size: 14px; background: #555;" onclick="moverEjercicioEditor('${idRutina}', ${index}, 1)">⬇️</button>` : `<div style="width: 38px;"></div>`;
-                contenedor.innerHTML += `<div class="lista-editor-item"><div style="flex: 1; padding-right: 10px;"><p>${ej.nombre}</p><small>${ej.series}x${ej.reps} | ${ej.peso}kg | ${ej.descanso}s</small></div><div style="display: flex; gap: 5px;">${btnUp}${btnDown}<button class="btn-principal btn-peligro" style="width: auto; padding: 8px; font-size: 14px; margin-left: 5px;" onclick="eliminarEjercicioEditor('${idRutina}', ${index})">✖</button></div></div>`;
+                let btnUp = index > 0 ? `<button class="btn-principal" style="width: auto; padding: 8px; font-size: 14px; background: rgba(255,255,255,0.1); box-shadow: none;" onclick="moverEjercicioEditor('${idRutina}', ${index}, -1)">⬆️</button>` : `<div style="width: 38px;"></div>`;
+                let btnDown = index < rutina.ejercicios.length - 1 ? `<button class="btn-principal" style="width: auto; padding: 8px; font-size: 14px; background: rgba(255,255,255,0.1); box-shadow: none;" onclick="moverEjercicioEditor('${idRutina}', ${index}, 1)">⬇️</button>` : `<div style="width: 38px;"></div>`;
+                contenedor.innerHTML += `<div class="lista-editor-item"><div style="flex: 1; padding-right: 10px;"><p>${ej.nombre}</p><small>${ej.series}x${ej.reps} | ${ej.peso}kg | ${ej.descanso}s</small></div><div style="display: flex; gap: 5px;">${btnUp}${btnDown}<button class="btn-principal btn-peligro" style="width: auto; padding: 8px; font-size: 14px; margin-left: 5px; box-shadow: none;" onclick="eliminarEjercicioEditor('${idRutina}', ${index})">✖</button></div></div>`;
             });
         }
         window.moverEjercicioEditor = function(id, index, dir) { const r = misRutinas[id]; if (!r) return; const n = index + dir; if (n < 0 || n >= r.ejercicios.length) return; const temp = r.ejercicios[index]; r.ejercicios[index] = r.ejercicios[n]; r.ejercicios[n] = temp; guardarRutinasEnNube(); mostrarEjerciciosEditor(); }
@@ -554,7 +743,6 @@
             else if (vista === 'perfil') { document.getElementById('vistaPerfil').classList.remove('oculto'); document.getElementById('btnTabPerfil').classList.add('activo'); }
         }
 
-        // --- MOTOR DEL ENTRENAMIENTO Y SOBRECARGA ---
         window.iniciarRutina = async function(idRutina) {
             estadoActual.idRutina = idRutina; estadoActual.datosRutina = misRutinas[idRutina]; estadoActual.ejercicioIndex = 0; estadoActual.serieActual = 1; 
             estadoActual.horaInicio = Date.now();
@@ -594,12 +782,24 @@
             document.getElementById('btnAccionPrincipal').innerText = `✔️ Completar Serie ${estadoActual.serieActual}`;
         }
 
+        // --- NUEVO: MOTOR DE SERIES CON MICROINTERACCIONES ---
         window.manejarBotonPrincipal = function() {
             const ejercicio = estadoActual.datosRutina.ejercicios[estadoActual.ejercicioIndex];
-            
             const rirSeleccionado = document.getElementById('uiRirInput').value;
             const repsHechas = parseInt(document.getElementById('uiRepsInput').value) || ejercicio.reps;
             const pesoUsado = parseFloat(document.getElementById('uiPesoInput').value) || ejercicio.peso;
+            
+            if (!repsHechas || !pesoUsado) {
+                vibrar('error');
+                document.getElementById('uiRepsInput').classList.add('animar-error');
+                setTimeout(() => document.getElementById('uiRepsInput').classList.remove('animar-error'), 400);
+                return;
+            }
+
+            vibrar('exito');
+            const btn = document.getElementById('btnAccionPrincipal');
+            btn.classList.add('animar-exito');
+            btn.innerText = "¡Hecho!";
             
             if(rirSeleccionado !== "calentamiento") {
                 estadoActual.volumenAcumulado += (repsHechas * pesoUsado);
@@ -609,20 +809,23 @@
                 }
             }
             
-            if (estadoActual.serieActual < ejercicio.series) {
-                estadoActual.serieActual++;
-                iniciarDescanso(ejercicio.descanso, "Descanso entre series", `Preparate para la Serie ${estadoActual.serieActual}`);
-            } else {
-                if (estadoActual.ejercicioIndex < estadoActual.datosRutina.ejercicios.length - 1) {
-                    const tiempoTransicion = ejercicio.descanso + 120;
-                    estadoActual.ejercicioIndex++; estadoActual.serieActual = 1;
-                    const proxEjercicio = estadoActual.datosRutina.ejercicios[estadoActual.ejercicioIndex];
-                    iniciarDescanso(tiempoTransicion, "Transición de Ejercicio", `Acomodá los discos para: ${proxEjercicio.nombre}`);
+            setTimeout(() => {
+                btn.classList.remove('animar-exito');
+                
+                if (estadoActual.serieActual < ejercicio.series) {
+                    estadoActual.serieActual++;
+                    iniciarDescanso(ejercicio.descanso, "Descanso en curso", `Preparate para la Serie ${estadoActual.serieActual}`);
                 } else {
-                    // LLAMAMOS AL MODAL DE FATIGA EN LUGAR DE CERRAR DIRECTO
-                    mostrarModalFatiga();
+                    if (estadoActual.ejercicioIndex < estadoActual.datosRutina.ejercicios.length - 1) {
+                        const tiempoTransicion = ejercicio.descanso + 60; 
+                        estadoActual.ejercicioIndex++; estadoActual.serieActual = 1;
+                        const proxEjercicio = estadoActual.datosRutina.ejercicios[estadoActual.ejercicioIndex];
+                        iniciarDescanso(tiempoTransicion, "Transición", `Siguiente: ${proxEjercicio.nombre}`);
+                    } else {
+                        mostrarModalFatiga();
+                    }
                 }
-            }
+            }, 400);
         }
 
         function reproducirBeep() {
@@ -633,28 +836,71 @@
             } catch (e) { }
         }
 
+        // --- NUEVO: RELOJ ANTI-SUSPENSIÓN BASADO EN TIMESTAMP ---
         function iniciarDescanso(segundos, titulo, subtitulo) {
-            document.getElementById('vistaEntrenamiento').classList.add('oculto'); document.getElementById('vistaDescanso').classList.remove('oculto');
-            tiempoRestante = segundos; document.getElementById('mensajeDescanso').innerText = titulo; document.getElementById('proximoPasoMensaje').innerText = subtitulo; actualizarRelojUI();
+            document.getElementById('vistaEntrenamiento').classList.add('oculto'); 
+            document.getElementById('vistaDescanso').classList.remove('oculto');
+            
+            document.getElementById('mensajeDescanso').innerText = titulo; 
+            document.getElementById('proximoPasoMensaje').innerText = subtitulo; 
+            
+            marcaTiempoFinDescanso = Date.now() + (segundos * 1000);
+            
+            try { 
+                const actx = window.AudioContext || window.webkitAudioContext;
+                if(actx) { const tempCtx = new actx(); tempCtx.resume(); }
+            } catch(e) {}
+
+            actualizarRelojUI();
+            
             clearInterval(temporizador);
-            temporizador = setInterval(() => { tiempoRestante--; actualizarRelojUI(); if (tiempoRestante <= 0) { terminarDescanso(); } }, 1000);
+            temporizador = setInterval(() => { 
+                actualizarRelojUI(); 
+            }, 500); 
         }
-        function actualizarRelojUI() { const m = Math.floor(tiempoRestante / 60).toString().padStart(2, '0'); const s = (tiempoRestante % 60).toString().padStart(2, '0'); document.getElementById('relojDisplay').innerText = `${m}:${s}`; }
-        window.sumarTiempo = function(segundos) { tiempoRestante += segundos; actualizarRelojUI(); }
-        window.saltarDescanso = function() { terminarDescanso(); }
+
+        function actualizarRelojUI() { 
+            const ahora = Date.now();
+            tiempoRestante = Math.ceil((marcaTiempoFinDescanso - ahora) / 1000);
+
+            if (tiempoRestante <= 0) { 
+                terminarDescanso(); 
+                return;
+            }
+
+            const m = Math.floor(tiempoRestante / 60).toString().padStart(2, '0'); 
+            const s = (tiempoRestante % 60).toString().padStart(2, '0'); 
+            document.getElementById('relojDisplay').innerText = `${m}:${s}`; 
+        }
+
+        window.sumarTiempo = function(segundos) { 
+            vibrar('click');
+            marcaTiempoFinDescanso += (segundos * 1000); 
+            actualizarRelojUI(); 
+        }
+
+        window.saltarDescanso = function() { 
+            vibrar('click');
+            terminarDescanso(); 
+        }
 
         function terminarDescanso() {
-            clearInterval(temporizador); if (navigator.vibrate) { navigator.vibrate([300, 100, 300, 100, 300]); }
-            reproducirBeep();
-            document.getElementById('vistaDescanso').classList.add('oculto'); document.getElementById('vistaEntrenamiento').classList.remove('oculto');
+            clearInterval(temporizador); 
+            vibrar('alarma');
+            reproducirBeep(); 
+            
+            const subtituloStr = document.getElementById('proximoPasoMensaje').innerText;
+            lanzarNotificacionLocal("¡Tiempo cumplido!", subtituloStr); 
+
+            document.getElementById('vistaDescanso').classList.add('oculto'); 
+            document.getElementById('vistaEntrenamiento').classList.remove('oculto');
             actualizarUIEjercicio();
         }
 
-        // --- SISTEMA DE FATIGA Y FINALIZAR ---
         window.mostrarModalFatiga = function() {
             clearInterval(temporizador); clearInterval(temporizadorTotal);
             document.getElementById('modalFatiga').classList.remove('oculto');
-            document.getElementById('inputNotasRutina').value = ""; // Limpiamos notas
+            document.getElementById('inputNotasRutina').value = "";
         }
 
         window.guardarFatigaYFinalizar = async function(nivelFatiga) {
