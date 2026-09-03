@@ -173,6 +173,10 @@
         .rutina-hoy-card span { font-size: 13px; color: var(--texto-secundario); }
         .btn-play-chico { width: 45px; height: 45px; padding: 0; border-radius: 50%; font-size: 18px; display: flex; align-items: center; justify-content: center; }
         
+        /* Nuevas clases para las tarjetas de caminata/partido */
+        .rutina-caminata::before { background: var(--exito) !important; }
+        .rutina-partido::before { background: var(--alerta) !important; }
+
         details summary { padding: 15px; background: rgba(0,0,0,0.2); border-radius: 12px; cursor: pointer; font-weight: 600; color: var(--texto); border: 1px solid var(--glass-border); list-style: none; display: flex; justify-content: space-between; align-items: center;}
         details summary::after { content: '+'; font-size: 20px; color: #007AFF; }
         details[open] summary::after { content: '-'; }
@@ -584,6 +588,18 @@
 
         let misRutinas = {}; 
         
+        // --- DICCIONARIO DE METAS DE PASOS/CAMINATA (NEAT) ---
+        // 0: Domingo, 1: Lunes, 2: Martes, 3: Miércoles, 4: Jueves, 5: Viernes, 6: Sábado
+        const caminataDiaria = {
+            1: { titulo: "🚶‍♂️ Caminata Diaria", desc: "Objetivo: 6km (~8000 pasos)", clase: "rutina-caminata" },
+            2: { titulo: "🚶‍♂️ Caminata Diaria", desc: "Objetivo: 6km (~8000 pasos)", clase: "rutina-caminata" },
+            3: { titulo: "🚶‍♂️ Caminata Diaria", desc: "Objetivo: 6km (~8000 pasos)", clase: "rutina-caminata" },
+            4: { titulo: "🚶‍♂️ Caminata Diaria", desc: "Objetivo: 6km (~8000 pasos)", clase: "rutina-caminata" },
+            5: { titulo: "🚶‍♂️ Caminata Ligera", desc: "Objetivo: 4km (~6000 pasos)", clase: "rutina-caminata" },
+            6: { titulo: "⚽ Partido de Fútbol", desc: "Día de partido (0km de caminata extra)", clase: "rutina-partido" },
+            0: { titulo: "🚶‍♂️ Caminata Diaria", desc: "Objetivo: 6km (~8000 pasos)", clase: "rutina-caminata" }
+        };
+
         // DISTRIBUCIÓN SEMANAL 
         // 1:Lunes, 2:Martes, 3:Miércoles, 4:Jueves (Quinta), 5:Viernes, 6:Sábado, 0:Domingo (Estructural)
         const planSemanal = { 
@@ -853,15 +869,39 @@
             if(Object.keys(misRutinas).length === 0) return; 
             const diaHoy = new Date().getDay(); const diaActivo = diaSeleccionado !== null ? diaSeleccionado : diaHoy;
             const contDias = document.getElementById('uiSelectorDias'); contDias.innerHTML = '';
+            
             nombresDias.forEach((nombre, index) => {
                 let clase = 'dia-btn'; if(index === diaActivo) clase += ' activo';
                 contDias.innerHTML += `<button class="${clase}" onclick="cargarRutinaDiaria(${index})">${nombre.substring(0, 3)}${(index === diaHoy)?' (Hoy)':''}</button>`;
             });
+            
             document.getElementById('tituloDiaPlan').innerText = (diaActivo === diaHoy) ? `Rutina de Hoy` : `Rutina del ${nombresDias[diaActivo]}`;
             const contenedor = document.getElementById('contenedorRutinasHoy'); contenedor.innerHTML = '';
+            
+            // Renderizar Rutinas de Pesas/Entrenamiento
             const rutinasDelDia = planSemanal[diaActivo];
-            if(rutinasDelDia.length === 0) contenedor.innerHTML = '<p style="color: var(--exito); text-align: center; font-weight: bold;">Día de descanso activo.</p>';
-            else rutinasDelDia.forEach(id => { const r = misRutinas[id]; if(r) contenedor.innerHTML += `<div class="rutina-hoy-card"><div><strong>${r.nombre}</strong><span>${r.ejercicios.length} ejercicios</span></div><button class="btn-principal btn-exito btn-play-chico" onclick="iniciarRutina('${id}')">▶</button></div>`; });
+            if(rutinasDelDia.length === 0) {
+                // No hay rutina de pesas, pero no mostramos "descanso activo" si hay caminata.
+            } else {
+                rutinasDelDia.forEach(id => { 
+                    const r = misRutinas[id]; 
+                    if(r) {
+                        contenedor.innerHTML += `<div class="rutina-hoy-card"><div><strong>${r.nombre}</strong><span>${r.ejercicios.length} ejercicios</span></div><button class="btn-principal btn-exito btn-play-chico" onclick="iniciarRutina('${id}')">▶</button></div>`; 
+                    }
+                });
+            }
+
+            // Renderizar Caminata / NEAT Diario como recordatorio visual
+            const metaCaminata = caminataDiaria[diaActivo];
+            if(metaCaminata) {
+                contenedor.innerHTML += `
+                    <div class="rutina-hoy-card ${metaCaminata.clase}" style="margin-top: 15px; background: rgba(0,0,0,0.4);">
+                        <div style="flex: 1;">
+                            <strong style="color: white; font-size: 16px;">${metaCaminata.titulo}</strong>
+                            <span style="color: var(--texto-secundario);">${metaCaminata.desc}</span>
+                        </div>
+                    </div>`;
+            }
         }
 
         window.cambiarVistaPrincipal = function(vista) {
