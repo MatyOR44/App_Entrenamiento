@@ -348,7 +348,7 @@
 
                 <div class="tarjeta">
                     <h2>Volumen de Carga Efectiva</h2>
-                    <p style="font-size: 12px; color: var(--texto-secundario); margin-top: -10px;">Tonelaje. Excluye series de Calentamiento.</p>
+                    <p style="font-size: 12px; color: var(--texto-secundario); margin-top: -10px;">Tonelaje. Excluye series de Calentamiento y Cardio.</p>
                     <div class="grafico-contenedor">
                         <canvas id="chartVolumen"></canvas>
                     </div>
@@ -492,7 +492,7 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // --- RUTINAS MAESTRAS (Actualizado a Atletismo y Push Unificado) ---
+        // --- RUTINAS MAESTRAS ACTUALIZADAS ---
         const RUTINAS_DEFAULT = {
             "push_1": { 
                 nombre: "Push 1 (Pecho, Hombro Lateral, Tríceps)", 
@@ -554,14 +554,13 @@
                     { nombre: "Elevación de Talones (Gemelos)", series: 4, reps: 15, peso: 30, unidad: "kg", descanso: 60, tipo: "aislado" } 
                 ] 
             },
-            "legs_b": { 
-                nombre: "Legs B (Transferencia Atlética y Cardio)", 
+            "legs_quinta": { 
+                nombre: "Legs B (Activación SNC y Prevención - Quinta)", 
                 ejercicios: [ 
-                    { nombre: "Saltos al Cajón / Longitud", series: 4, reps: 5, peso: 0, unidad: "kg", descanso: 90, tipo: "compuesto" }, 
-                    { nombre: "Circuitos Agilidad y Balón (minutos)", series: 1, reps: 1, peso: 15, unidad: "min", descanso: 0, tipo: "compuesto" }, 
-                    { nombre: "Estocadas Laterales", series: 3, reps: 10, peso: 10, unidad: "kg", descanso: 90, tipo: "compuesto" }, 
-                    { nombre: "Curl Nórdico (Excéntrica)", series: 3, reps: 8, peso: 0, unidad: "kg", descanso: 120, tipo: "aislado" }, 
-                    { nombre: "Cardio Integrado Zona 2 (minutos)", series: 1, reps: 1, peso: 30, unidad: "min", descanso: 0, tipo: "compuesto" } 
+                    { nombre: "Saltos de Longitud / Cajón", series: 3, reps: 5, peso: 0, unidad: "kg", descanso: 120, tipo: "compuesto" }, 
+                    { nombre: "Curl Nórdico (Excéntrica)", series: 3, reps: 5, peso: 0, unidad: "kg", descanso: 90, tipo: "aislado" }, 
+                    { nombre: "Estocadas Laterales (Mancuernas)", series: 3, reps: 8, peso: 10, unidad: "kg", descanso: 90, tipo: "compuesto" }, 
+                    { nombre: "Circuito Agilidad Balón (min)", series: 1, reps: 1, peso: 15, unidad: "min", descanso: 0, tipo: "compuesto" } 
                 ] 
             },
             "pantorrillas": { 
@@ -585,15 +584,16 @@
 
         let misRutinas = {}; 
         
-        // DISTRIBUCIÓN SEMANAL (Enfoque Atlético)
+        // DISTRIBUCIÓN SEMANAL 
+        // 1:Lunes, 2:Martes, 3:Miércoles, 4:Jueves (Quinta), 5:Viernes, 6:Sábado, 0:Domingo (Estructural)
         const planSemanal = { 
             1: ["push_2"], 
             2: ["pull_2"], 
             3: ["core_1"], 
-            4: ["legs_a"], 
+            4: ["legs_quinta"], 
             5: ["push_1", "pantorrillas"], 
             6: ["pull_1"], 
-            0: ["legs_b"] 
+            0: ["legs_a"] 
         };
         const nombresDias = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
 
@@ -675,13 +675,22 @@
                 unsubscribeRutinas = onSnapshot(doc(db, "usuarios", user.uid), (docSnap) => {
                     if (docSnap.exists()) {
                         const data = docSnap.data();
-                        // Actualizar a las nuevas rutinas maestras en lugar de mantener las viejas
-                        if(data.rutinasCustom && data.rutinasCustom["legs_b"]) { 
+                        
+                        if(data.rutinasCustom) { 
                             misRutinas = data.rutinasCustom; 
+                            
+                            // Lógica de inyección inteligente: Si ya tienes las rutinas guardadas, inyectamos o actualizamos 
+                            // silenciosamente "legs_quinta" y "legs_a" sin tocar tus progresos de push y pull.
+                            if(!misRutinas["legs_quinta"] || misRutinas["legs_quinta"].ejercicios.length !== 4) {
+                                misRutinas["legs_quinta"] = JSON.parse(JSON.stringify(RUTINAS_DEFAULT["legs_quinta"]));
+                                misRutinas["legs_a"] = JSON.parse(JSON.stringify(RUTINAS_DEFAULT["legs_a"]));
+                                guardarRutinasEnNube();
+                            }
+                            
                         } else { 
-                            // Si detecta una base de datos vieja (sin piernas B), la sobreescribe suavemente.
                             misRutinas = JSON.parse(JSON.stringify(RUTINAS_DEFAULT)); guardarRutinasEnNube(); 
                         }
+                        
                         if(data.pesoCorporal) { pesoCorporalUsuario = data.pesoCorporal; document.getElementById('inputPesoCorporal').value = pesoCorporalUsuario; }
                         
                         if(data.hombros) document.getElementById('inputHombros').value = data.hombros;
@@ -1045,6 +1054,7 @@
             document.getElementById('modalFatiga').classList.add('oculto');
             const notasUsuario = document.getElementById('inputNotasRutina').value.trim();
             const duracionMin = segundosTotales / 60;
+            // Solo cuenta el peso levantado en 'kg' para el tonelaje.
             const caloriasQuemadas = Math.round(5.0 * pesoCorporalUsuario * (duracionMin / 60));
 
             try {
