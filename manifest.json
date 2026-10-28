@@ -1,10 +1,12 @@
 {
-  "name": "App Entrenamiento",
+  "id": "/?v=2",
+  "start_url": "./index.html?v=2",
+  "name": "App Entrenamiento Pro",
   "short_name": "App Entrenamiento",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#121212",
-  "theme_color": "#3498db",
+  "background_color": "#0d0d12",
+  "theme_color": "#0d0d12",
   "icons": [
     {
       "src": "icono-192.png",
