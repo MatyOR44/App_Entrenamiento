@@ -1039,14 +1039,15 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        const VERSION_PLAN_MAESTRO = "2026_PRO_V6_JUEVES_UNIFICADO";
-        const STORAGE_KEY_SESION = "gym_pro_sesion_activa_v6";
+        const VERSION_PLAN_MAESTRO = "2026_PRO_V7_VIERNES_UNIFICADO";
+        const STORAGE_KEY_SESION = "gym_pro_sesion_activa_v7";
 
-        // Lista de claves obsoletas o que ahora fueron fusionadas en las sesiones unificadas del jueves
+        // Lista de claves obsoletas o que ahora fueron fusionadas en sesiones unificadas
         const CLAVES_OBSOLETAS = [
             "push_1_1", "push_1_2", "pull_1", "legs", "legs_1",
             "cadena_anterior", "cadena_posterior", "pantorrillas", "core_1",
-            "legs_2", "hombros_2", "movilidad_2", "campo_2"
+            "legs_2", "hombros_2", "movilidad_2", "campo_2",
+            "pull_2", "core_c"
         ];
 
         // =========================================================================
@@ -1207,31 +1208,29 @@
                 ]
             },
 
-            // --- VIERNES ---
-            "pull_2": {
-                nombre: "Pull 2: Espalda (Amplitud sin Carga Lumbar) y Bíceps",
-                turno: "manana", categoria: "fuerza", infoExtra: "Viernes Mañana (Casa) • Protege cintura pre-partido",
+            // =====================================================================
+            // --- VIERNES UNIFICADO (MAÑANA: PULL 2 + CORE C | TARDE: LISS) ---
+            // =====================================================================
+            "viernes_manana": {
+                nombre: "Viernes Mañana: Pull 2 (Amplitud y Bíceps) + Core C (Unificada)",
+                turno: "manana", categoria: "fuerza", infoExtra: "Viernes Mañana (Casa) • 9 ejercicios (Cero carga lumbar pre-partido)",
                 ejercicios: [
+                    // Bloque 1: Pull 2 (Ejercicios 1 al 6)
                     { nombre: "Jalón al Pecho (Abierto)", series: 4, reps: 10, peso: 6, unidad: "discos", descanso: 120, descansoEjercicio: 180, tipo: "compuesto" },
                     { nombre: "Remo con Mancuerna", series: 3, reps: 12, peso: 15, unidad: "kg", descanso: 90, descansoEjercicio: 150, tipo: "compuesto" },
                     { nombre: "Pull-Over con Cuerda", series: 3, reps: 15, peso: 2, unidad: "discos", descanso: 75, descansoEjercicio: 120, tipo: "aislado" },
                     { nombre: "Curl con Barra de Pie", series: 3, reps: 10, peso: 20, unidad: "kg", descanso: 90, descansoEjercicio: 150, tipo: "aislado" },
                     { nombre: "Curl Inclinado (45°)", series: 3, reps: 12, peso: 7, unidad: "kg", descanso: 90, descansoEjercicio: 150, tipo: "aislado" },
-                    { nombre: "Curl Invertido (Barra)", series: 3, reps: 15, peso: 15, unidad: "kg", descanso: 75, descansoEjercicio: 120, tipo: "aislado" }
-                ]
-            },
-            "core_c": {
-                nombre: "Core C: Recto Abdominal y Vacuum (Cintura)",
-                turno: "manana", categoria: "core", infoExtra: "Viernes Mañana (Casa) • Al finalizar Pull 2",
-                ejercicios: [
+                    { nombre: "Curl Invertido (Barra)", series: 3, reps: 15, peso: 15, unidad: "kg", descanso: 75, descansoEjercicio: 120, tipo: "aislado" },
+                    // Bloque 2: Core C (Ejercicios 7, 8 y 9)
                     { nombre: "Crunch abdominal con peso", series: 3, reps: 15, peso: 5, unidad: "kg", descanso: 60, descansoEjercicio: 90, tipo: "movilidad" },
                     { nombre: "Elevaciones de Piernas Colgado", series: 3, reps: 12, peso: 0, unidad: "kg", descanso: 60, descansoEjercicio: 90, tipo: "movilidad" },
                     { nombre: "Vacío Abdominal (Stomach Vacuum)", series: 4, reps: 20, peso: 20, unidad: "seg", descanso: 45, descansoEjercicio: 60, tipo: "movilidad" }
                 ]
             },
             "caminata_moderada": {
-                nombre: "Caminata LISS Moderada Pre-Partido",
-                turno: "tarde", categoria: "caminata", infoExtra: "Viernes Tarde (Quinta) • Sin fatiga muscular",
+                nombre: "Viernes Tarde: Caminata LISS Moderada Pre-Partido (50m)",
+                turno: "tarde", categoria: "caminata", infoExtra: "Viernes Tarde (Quinta) • Sin fatiga muscular (Zona 1)",
                 ejercicios: [
                     { nombre: "Caminata Fluida en Zona 1 (Activación Circulatoria)", series: 1, reps: 50, peso: 50, unidad: "min", descanso: 0, descansoEjercicio: 0, tipo: "campo" }
                 ]
@@ -1284,7 +1283,7 @@
             2: ["movilidad_1", "legs_a", "hombros_1", "campo_1", "caminata_post"],
             3: ["push_1", "core_b", "caminata_larga", "movilidad_profunda"],
             4: ["jueves_manana", "jueves_tarde"],
-            5: ["pull_2", "core_c", "caminata_moderada"],
+            5: ["viernes_manana", "caminata_moderada"],
             6: ["partido_futbol"],
             0: ["push_2", "caminata_regenerativa"]
         };
@@ -1973,6 +1972,229 @@
                     `, "3 CONOS EN 'L' (5M × 5M) A 6M DE LA PARED")
                 };
             }
+            
+            // =================================================================
+            // --- EJERCICIOS ESPECÍFICOS DEL VIERNES (PULL 2 + CORE C) ---
+            // =================================================================
+
+            // --- V1. JALÓN AL PECHO (ABIERTO) ---
+            if (n.includes("jalón al pecho (abierto)")) {
+                return {
+                    tempo: "Tempo: 2-1-1-0",
+                    musculo: "Dorsal Ancho (Fibras Superiores / Amplitud V-Taper)",
+                    postura: "Sentado con muslos bien trabados bajo el rodillo, pecho proyectado hacia arriba (extensión torácica) y leve inclinación del torso hacia atrás de 10°-15° fijos.",
+                    agarre: "Agarre pronado abierto (1.5 veces el ancho de tus hombros). Desactiva los bíceps imaginando que tus manos son simples ganchos.",
+                    clave: "Inicia la tracción con una depresión escapular (bajar hombros lejos de las orejas) y tira llevando los codos hacia abajo y adentro hasta tocar la clavícula alta.",
+                    svg: generarEscenaSVG(`
+                        <!-- Estructura de polea alta -->
+                        <line x1="110" y1="12" x2="110" y2="48" stroke="rgba(255,255,255,0.35)" stroke-width="2.5"/>
+                        <line x1="55" y1="48" x2="165" y2="48" class="maniqui-carga"/>
+                        <path d="M55 48 L45 56 M165 48 L175 56" class="maniqui-carga"/>
+                        <!-- Banco y rodillo -->
+                        <path d="M88 156 L88 118 L132 118 L132 156" class="maniqui-banco"/>
+                        <!-- Maniquí en tracción amplia -->
+                        <circle cx="110" cy="68" r="9" class="maniqui-cabeza"/>
+                        <line x1="110" y1="78" x2="110" y2="118" class="maniqui-cuerpo"/>
+                        <path d="M110 118 L92 135 L92 156 M110 118 L128 135 L128 156" class="maniqui-cuerpo"/>
+                        <!-- Brazos abiertos tirando de la barra -->
+                        <path d="M110 84 L74 82 L55 50" class="maniqui-cuerpo"/>
+                        <path d="M110 84 L146 82 L165 50" class="maniqui-cuerpo"/>
+                        <circle cx="74" cy="82" r="3.5" class="maniqui-articulacion"/>
+                        <circle cx="146" cy="82" r="3.5" class="maniqui-articulacion"/>
+                        <!-- Vectores de fuerza de codos hacia las costillas -->
+                        <path d="M62 66 L76 98" class="maniqui-vector"/>
+                        <path d="M158 66 L144 98" class="maniqui-vector"/>
+                    `, "AGARRE ABIERTO 1.5X • DEPRESIÓN ESCAPULAR")
+                };
+            }
+
+            // --- V2. REMO CON MANCUERNA (UNILATERAL CON APOYO) ---
+            if (n.includes("remo con mancuerna")) {
+                return {
+                    tempo: "Tempo: 2-1-1-0",
+                    musculo: "Dorsal Ancho Unilateral (Cero Estrés Lumbar)",
+                    postura: "Trípode estable sobre el banco: apoya la rodilla y la mano del mismo lado sobre el banco horizontal; la pierna del lado que rema va firme en el piso ligeramente atrasada.",
+                    agarre: "Agarre neutro firme pegado al cuerpo. Este apoyo descarga al 100% los erectores espinales para que llegues con la cintura fresca al partido del sábado.",
+                    clave: "No subas la mancuerna recto hacia el hombro (eso activa el bíceps); llévala en un movimiento de péndulo o arco hacia atrás apuntando al bolsillo de tu cadera.",
+                    svg: generarEscenaSVG(`
+                        <!-- Banco plano -->
+                        <line x1="45" y1="116" x2="155" y2="116" class="maniqui-banco"/>
+                        <line x1="60" y1="116" x2="60" y2="156" class="maniqui-banco"/>
+                        <line x1="140" y1="116" x2="140" y2="156" class="maniqui-banco"/>
+                        <!-- Maniquí en trípode -->
+                        <circle cx="58" cy="70" r="8.5" class="maniqui-cabeza"/>
+                        <path d="M68 74 L126 78 L126 114 L144 114" class="maniqui-cuerpo-sec"/>
+                        <line x1="76" y1="76" x2="72" y2="114" class="maniqui-cuerpo-sec"/>
+                        <path d="M126 78 L148 118 L154 156" class="maniqui-cuerpo"/>
+                        <!-- Brazo traccionando en péndulo hacia la cadera -->
+                        <path d="M82 76 L108 62 L106 98" class="maniqui-cuerpo"/>
+                        <circle cx="108" cy="62" r="3.5" class="maniqui-articulacion"/>
+                        <rect x="98" y="96" width="16" height="9" rx="2" class="maniqui-carga"/>
+                        <!-- Vector curvo de péndulo -->
+                        <path d="M78 132 Q102 126 112 86" class="maniqui-vector"/>
+                    `, "APOYO EN TRÍPODE • ARCO HACIA LA CADERA")
+                };
+            }
+
+            // --- V3. PULL-OVER CON CUERDA (POLEA ALTA) ---
+            if (n.includes("pull-over con cuerda") || n.includes("pull-over")) {
+                return {
+                    tempo: "Tempo: 3-1-1-0",
+                    musculo: "Dorsal Ancho y Redondo Mayor (Extensión de Hombro)",
+                    postura: "De pie a un paso de la polea alta, pies al ancho de caderas, torso inclinado a 45° con columna neutra y core compactado.",
+                    agarre: "Agarre neutro en los topes de la cuerda, codos destrabados con una mínima flexión fija de 15° que no varía en todo el recorrido.",
+                    clave: "Describiendo un arco amplio con los brazos casi rígidos, lleva las manos hasta los lados de los muslos abriendo levemente la cuerda al final y apretando axilas 1s.",
+                    svg: generarEscenaSVG(`
+                        <!-- Cable desde polea alta izquierda -->
+                        <circle cx="35" cy="28" r="6" fill="#48485A"/>
+                        <line x1="35" y1="28" x2="108" y2="112" stroke="#FF9F0A" stroke-width="3"/>
+                        <!-- Maniquí inclinado a 45° -->
+                        <circle cx="88" cy="54" r="9" class="maniqui-cabeza"/>
+                        <path d="M95 62 L132 104 L120 132 L124 156" class="maniqui-cuerpo"/>
+                        <!-- Posición inicial arriba punteada -->
+                        <line x1="102" y1="70" x2="62" y2="48" class="maniqui-cuerpo-sec"/>
+                        <!-- Posición final pegada al muslo -->
+                        <line x1="102" y1="70" x2="110" y2="112" class="maniqui-cuerpo"/>
+                        <circle cx="102" cy="70" r="3.5" class="maniqui-articulacion"/>
+                        <circle cx="110" cy="114" r="5.5" class="maniqui-carga"/>
+                        <!-- Arco de extensión pura de hombro -->
+                        <path d="M62 56 Q72 98 102 115" class="maniqui-vector"/>
+                    `, "CODOS FIJOS • ARCO DE EXTENSIÓN DE HOMBRO")
+                };
+            }
+
+            // --- V4. CURL CON BARRA DE PIE ---
+            if (n.includes("curl con barra de pie")) {
+                return {
+                    tempo: "Tempo: 2-1-1-0",
+                    musculo: "Bíceps Braquial (Cabeza Corta y Larga)",
+                    postura: "De pie con rodillas destrabadas, glúteos y abdomen contraídos en bloque para impedir cualquier hiperextensión o balanceo lumbar.",
+                    agarre: "Agarre supino (palmas hacia arriba) al ancho exacto de tus hombros; codos pegados a las costillas.",
+                    clave: "Sube contrayendo el bíceps sin adelantar los codos en exceso y desciende resistiendo la bajada durante 2-3 segundos hasta estirar el brazo.",
+                    svg: generarEscenaSVG(`
+                        <circle cx="105" cy="38" r="9" class="maniqui-cabeza"/>
+                        <path d="M105 49 L105 104 L96 156 M105 104 L114 156" class="maniqui-cuerpo"/>
+                        <!-- Húmero vertical fijo y antebrazo en flexión -->
+                        <line x1="105" y1="58" x2="105" y2="88" class="maniqui-cuerpo"/>
+                        <line x1="105" y1="88" x2="140" y2="66" class="maniqui-cuerpo"/>
+                        <line x1="105" y1="88" x2="132" y2="114" class="maniqui-cuerpo-sec"/>
+                        <circle cx="105" cy="88" r="4" class="maniqui-articulacion"/>
+                        <circle cx="144" cy="64" r="9" class="maniqui-carga"/>
+                        <path d="M140 112 Q154 88 144 68" class="maniqui-vector"/>
+                    `, "HÚMERO VERTICAL FIJO • CERO INERCIA LUMBAR")
+                };
+            }
+
+            // --- V5. CURL INCLINADO (45°) ---
+            if (n.includes("curl inclinado")) {
+                return {
+                    tempo: "Tempo: 3-0-1-1",
+                    musculo: "Bíceps Braquial (Énfasis Cabeza Larga en Estiramiento)",
+                    postura: "Sentado con espalda y cabeza totalmente apoyadas sobre el respaldo inclinado a 45°-60°, hombros retraídos hacia atrás.",
+                    agarre: "Mancuernas en supinación constante (palmas mirando al frente desde abajo). Los brazos cuelgan perpendiculares al suelo por detrás de la línea del torso.",
+                    clave: "La clave absoluta es NO llevar el codo hacia adelante al subir: mantén el codo apuntando clavado al piso para estirar al máximo el tendón de la cabeza larga.",
+                    svg: generarEscenaSVG(`
+                        <!-- Banco a 45 grados -->
+                        <line x1="52" y1="142" x2="128" y2="66" class="maniqui-banco"/>
+                        <line x1="52" y1="142" x2="102" y2="142" class="maniqui-banco"/>
+                        <!-- Maniquí recostado a 45° -->
+                        <circle cx="122" cy="52" r="8.5" class="maniqui-cabeza"/>
+                        <path d="M114 62 L74 102 L112 112 L118 156" class="maniqui-cuerpo"/>
+                        <!-- Húmero vertical detrás del torso -->
+                        <line x1="106" y1="70" x2="106" y2="106" class="maniqui-cuerpo"/>
+                        <line x1="106" y1="106" x2="138" y2="82" class="maniqui-cuerpo"/>
+                        <line x1="106" y1="106" x2="106" y2="136" class="maniqui-cuerpo-sec"/>
+                        <circle cx="106" cy="106" r="3.5" class="maniqui-articulacion"/>
+                        <rect x="134" y="74" width="12" height="9" rx="2" class="maniqui-carga"/>
+                        <path d="M116 135 Q142 115 140 86" class="maniqui-vector"/>
+                    `, "BANCO A 45° • HÚMERO DETRÁS DEL TORSO")
+                };
+            }
+
+            // --- V6. CURL INVERTIDO (BARRA) ---
+            if (n.includes("curl invertido")) {
+                return {
+                    tempo: "Tempo: 2-1-1-0",
+                    musculo: "Braquiorradial, Braquial Anterior y Extensores",
+                    postura: "De pie erguido con abdomen firme, hombros bajos y codos pegados a los flancos del torso.",
+                    agarre: "Agarre pronado estricto (nudillos y dorso de las manos mirando hacia el techo durante todo el recorrido) con muñecas neutras de acero.",
+                    clave: "No dobles las muñecas hacia abajo al subir; levanta la barra hasta los 90°-100° apretando fuerte el antebrazo para dar grosor lateral al brazo.",
+                    svg: generarEscenaSVG(`
+                        <circle cx="102" cy="38" r="9" class="maniqui-cabeza"/>
+                        <path d="M102 49 L102 104 L94 156 M102 104 L110 156" class="maniqui-cuerpo"/>
+                        <line x1="102" y1="58" x2="102" y2="88" class="maniqui-cuerpo"/>
+                        <line x1="102" y1="88" x2="138" y2="76" class="maniqui-cuerpo"/>
+                        <circle cx="102" cy="88" r="4" class="maniqui-articulacion"/>
+                        <!-- Barra y detalle de muñeca pronada recta -->
+                        <rect x="134" y="70" width="14" height="10" rx="2" class="maniqui-carga"/>
+                        <path d="M132 118 Q148 96 142 78" class="maniqui-vector"/>
+                    `, "AGARRE PRONADO (DORSO ARRIBA) • MUÑECA RECTA")
+                };
+            }
+
+            // --- V7. CRUNCH ABDOMINAL CON PESO ---
+            if (n.includes("crunch abdominal con peso") || n.includes("crunch abdominal corto")) {
+                return {
+                    tempo: "Tempo: 2-2-1-0",
+                    musculo: "Recto Abdominal Superior (Hipertrofia de Bloques)",
+                    postura: "Acostado boca arriba con rodillas flexionadas a 90°, plantas apoyadas y zona lumbar completamente aplastada contra el piso.",
+                    agarre: "Disco de 5 kg o mancuerna sujeta sobre el pecho alto (clavículas) o con brazos extendidos apuntando al techo.",
+                    clave: "No te sientes (eso usa el psoas): enrolla únicamente la columna dorsal despegando las escápulas del suelo mientras exhalas todo el aire y sostén 2s arriba.",
+                    svg: generarEscenaSVG(`
+                        <!-- Maniquí en flexión torácica con disco -->
+                        <circle cx="62" cy="112" r="8.5" class="maniqui-cabeza"/>
+                        <path d="M70 118 Q95 142 126 148 L154 114 L174 154" class="maniqui-cuerpo"/>
+                        <!-- Brazo sosteniendo el disco de 5kg sobre el pecho -->
+                        <line x1="82" y1="126" x2="96" y2="106" class="maniqui-cuerpo"/>
+                        <circle cx="98" cy="102" r="9" class="maniqui-carga"/>
+                        <path d="M60 138 Q68 106 88 94" class="maniqui-vector"/>
+                    `, "FLEXIÓN TORÁCICA PURA • LUMBAR PEGADA AL PISO")
+                };
+            }
+
+            // --- V8. ELEVACIONES DE PIERNAS COLGADO ---
+            if (n.includes("elevaciones de piernas colgado") || n.includes("elevación de piernas")) {
+                return {
+                    tempo: "Tempo: 3-1-1-0 (Sin Balanceo)",
+                    musculo: "Recto Abdominal Inferior y Control Pélvico",
+                    postura: "Colgado de la barra con agarre firme y hombros activos (leve depresión escapular para no colgar pasivamente de los ligamentos).",
+                    agarre: "Piernas juntas extendidas o con mínima flexión de rodillas.",
+                    clave: "Para trabajar el abdomen y no solo los flexores de cadera, debes enrollar la pelvis hacia arriba al final de la subida (mostrar los glúteos hacia el frente). Baja en 3s sin columpiarte.",
+                    svg: generarEscenaSVG(`
+                        <!-- Barra de dominadas superior -->
+                        <line x1="70" y1="18" x2="150" y2="18" class="maniqui-banco"/>
+                        <!-- Maniquí colgado realizando retroversión pélvica -->
+                        <line x1="102" y1="18" x2="102" y2="48" class="maniqui-cuerpo"/>
+                        <circle cx="102" cy="40" r="8" class="maniqui-cabeza"/>
+                        <path d="M102 48 L102 92 Q108 102 118 96 L162 76" class="maniqui-cuerpo"/>
+                        <line x1="102" y1="92" x2="102" y2="148" class="maniqui-cuerpo-sec"/>
+                        <circle cx="102" cy="92" r="4" class="maniqui-articulacion"/>
+                        <path d="M114 142 Q148 122 156 82" class="maniqui-vector"/>
+                    `, "RETROVERSIÓN PÉLVICA ARRIBA • CERO BALANCEO")
+                };
+            }
+
+            // --- V9. VACÍO ABDOMINAL (STOMACH VACUUM) ---
+            if (n.includes("vacío abdominal") || n.includes("vacíum") || n.includes("vacuum")) {
+                return {
+                    tempo: "Isométrico: 20s Retención × 4",
+                    musculo: "Transverso Abdominal (Reducción de Cintura V-Taper)",
+                    postura: "De pie con manos apoyadas en las rodillas (o en cuadrupedia / de rodillas), espalda neutra y hombros relajados.",
+                    agarre: "1) Inhala profundo por la nariz. 2) Exhala absolutamente TODO el aire por la boca hasta vaciar los pulmones por completo.",
+                    clave: "3) En apnea (sin aire), expande las costillas como si fueras a inhalar y hunde el ombligo con máxima fuerza hacia tu columna vertebral manteniendo 20 segundos en el cronómetro.",
+                    svg: generarEscenaSVG(`
+                        <circle cx="105" cy="36" r="9" class="maniqui-cabeza"/>
+                        <!-- Costillas expandidas y cintura hundida hacia la columna -->
+                        <path d="M105 47 L105 74 Q92 92 105 108 L96 156 M105 108 L114 156" class="maniqui-cuerpo"/>
+                        <!-- Línea abdominal normal de referencia -->
+                        <path d="M118 74 Q124 92 114 108" class="maniqui-cuerpo-sec"/>
+                        <!-- Flechas de succión del ombligo hacia la columna -->
+                        <path d="M136 90 L108 90" stroke="#FF9F0A" stroke-width="3"/>
+                        <polygon points="106,90 113,86 113,94" fill="#FF9F0A"/>
+                        <circle cx="102" cy="90" r="6" fill="rgba(52,199,89,0.45)"/>
+                    `, "EXHALACIÓN TOTAL • SUCCIÓN DEL TRANSVERSO (20S)")
+                };
+            }
 
             // --- CAMINATA LISS (30, 20, 50, 60, 65 MIN) ---
             if (n.includes("caminata")) {
@@ -2575,7 +2797,7 @@
                             misRutinas = JSON.parse(JSON.stringify(RUTINAS_DEFAULT));
                             if (data.rutinasCustom) {
                                 for (const k in misRutinas) {
-                                    if (k === "jueves_manana" || k === "jueves_tarde") continue;
+                                    if (k === "jueves_manana" || k === "jueves_tarde" || k === "viernes_manana") continue;
                                     if (data.rutinasCustom[k] && Array.isArray(data.rutinasCustom[k].ejercicios)) {
                                         misRutinas[k].ejercicios.forEach(ejNuevo => {
                                             const ejViejo = data.rutinasCustom[k].ejercicios.find(e => e.nombre === ejNuevo.nombre);
