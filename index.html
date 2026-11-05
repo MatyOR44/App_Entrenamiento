@@ -817,7 +817,7 @@
                         </div>
                         <div class="guia-grid">
                             <div class="guia-item">
-                                <strong>📐 Postura y Posición Inicial</strong>
+                                <strong id="lblTituloPosturaGuia">📐 Postura y Posición Inicial</strong>
                                 <span id="uiGuiaPostura"></span>
                             </div>
                             <div class="guia-item" style="border-left-color: var(--alerta);">
@@ -1827,21 +1827,150 @@
                 };
             }
 
-            // --- CAMPO 2: 5-10-5 / ZIG-ZAG / SLALOM / AGILIDAD EN L ---
-            if (n.includes("5-10-5") || n.includes("zig-zag") || n.includes("slalom") || n.includes("agilidad en 'l'")) {
+            // --- CAMPO 2.1: DESACELERACIÓN Y RE-ACELERACIÓN 5-10-5 M (PRO-AGILITY) ---
+            if (n.includes("5-10-5")) {
                 return {
                     tempo: "100% Explosivo • Frenado Bajo",
-                    musculo: "Cambio de Dirección (COD) y Freno Excéntrico",
-                    postura: "Antes de llegar al cono de giro, baja drásticamente las caderas con pasos cortos de ajuste ('stutter steps') e inclina el torso hacia la nueva dirección.",
-                    agarre: "100% con Botines de Fútbol. Clava el borde interno del pie externo al giro para absorber y re-acelerar sin resbalar.",
-                    clave: "Respeta los 90s-105s de pausa completa caminando para que cada cambio de dirección sea a velocidad real de partido.",
+                    musculo: "Freno Excéntrico y Re-Aceleración COD 180°",
+                    postura: "ARMADO DE CONOS: Coloca 3 conos en línea recta separados por 5 metros entre sí (Cono A a la izquierda, Cono B en el centro a los 5m, Cono C a la derecha a los 10m). Deja al menos 5 metros libres respecto a las paredes. Inicia a horcajadas sobre el Cono B (central).",
+                    agarre: "RECORRIDO (20m totales): 1) Corre 5m a tope hacia el Cono C y tócalo con la mano bajando la cadera. 2) Gira 180° y haz un sprint de 10m cruzando toda la pista hasta tocar el Cono A. 3) Gira 180° y remata con 5m de sprint cruzando la línea del Cono B central.",
+                    clave: "A 1.5 metros de cada cono realiza pasos cortos de ajuste ('stutter steps') bajando el centro de gravedad; clava el borde interno del pie externo para rebotar como un resorte.",
                     svg: generarEscenaSVG(`
-                        <polygon points="40,156 48,136 56,156" fill="#FF9F0A"/>
-                        <polygon points="168,156 176,136 184,156" fill="#FF9F0A"/>
-                        <circle cx="122" cy="54" r="9" class="maniqui-cabeza"/>
-                        <path d="M118 64 L98 104 L68 128 L55 154 M98 104 L132 124 L142 154" class="maniqui-cuerpo"/>
-                        <path d="M58 118 L155 118" class="maniqui-vector"/>
-                    `, "VECTOR DE FRENADO Y CORTE LATERAL (COD)")
+                        <!-- Línea de carrera -->
+                        <line x1="35" y1="115" x2="185" y2="115" stroke="rgba(255,255,255,0.18)" stroke-width="2" stroke-dasharray="4 4"/>
+                        <!-- Cono A (0m - Izquierda) -->
+                        <polygon points="30,122 36,104 42,122" fill="#FF9F0A"/>
+                        <text x="24" y="136" class="maniqui-texto" fill="#FF9F0A">CONO A (0m)</text>
+                        <!-- Cono B (5m - Centro / Salida) -->
+                        <polygon points="104,122 110,104 116,122" fill="#00E5FF"/>
+                        <text x="86" y="136" class="maniqui-texto" fill="#00E5FF">CONO B (5m)</text>
+                        <!-- Cono C (10m - Derecha) -->
+                        <polygon points="178,122 184,104 190,122" fill="#FF9F0A"/>
+                        <text x="160" y="136" class="maniqui-texto" fill="#FF9F0A">CONO C (10m)</text>
+                        <!-- Vectores de los 3 tramos: 1) 5m der, 2) 10m izq, 3) 5m centro -->
+                        <path d="M110 92 L180 92" stroke="#34C759" stroke-width="2.5"/>
+                        <polygon points="182,92 175,88 175,96" fill="#34C759"/>
+                        <text x="128" y="85" class="maniqui-texto" fill="#34C759">1° (5m)</text>
+
+                        <path d="M180 68 L38 68" stroke="#00E5FF" stroke-width="2.5"/>
+                        <polygon points="34,68 41,64 41,72" fill="#00E5FF"/>
+                        <text x="88" y="61" class="maniqui-texto" fill="#00E5FF">2° SPRINT (10m)</text>
+
+                        <path d="M38 44 L108 44" stroke="#FF9F0A" stroke-width="2.5"/>
+                        <polygon points="112,44 105,40 105,48" fill="#FF9F0A"/>
+                        <text x="55" y="37" class="maniqui-texto" fill="#FF9F0A">3° FINAL (5m)</text>
+                    `, "PLANO AÉREO • 3 CONOS EN LÍNEA CADA 5M")
+                };
+            }
+
+            // --- CAMPO 2.2: CIRCUITO DE CORTE EN ZIG-ZAG (5 CONOS A 4x3M EN 20M) ---
+            if (n.includes("zig-zag")) {
+                return {
+                    tempo: "Cortes Agudos a 95-100%",
+                    musculo: "Aductores, Glúteo Medio y Cuádriceps",
+                    postura: "ARMADO DE CONOS: Usa un corredor de 20m a lo largo del terreno (dejando 8m libres al final para frenar antes de la pared). Coloca 5 conos escalonados en dos filas paralelas separadas por 3 metros de ancho, avanzando 4 metros de largo entre cada cono (0m, 4m, 8m, 12m y 16m) más una puerta de salida a los 20m.",
+                    agarre: "RECORRIDO: Sal del Cono 1 en diagonal explosiva hacia el Cono 2; rodea por fuera clavando el pie externo y cambia de dirección hacia el Cono 3. Repite en los 5 conos y termina con un pique recto de 4m hasta los 20m.",
+                    clave: "Alterna el lado de salida en cada serie (3 saliendo hacia la derecha, 3 hacia la izquierda). Inclina el torso hacia adentro del giro para no perder velocidad.",
+                    svg: generarEscenaSVG(`
+                        <!-- Cotas de ancho y largo -->
+                        <line x1="22" y1="52" x2="22" y2="128" stroke="rgba(255,255,255,0.25)" stroke-width="1.5"/>
+                        <text x="6" y="92" class="maniqui-texto">3m</text>
+                        <line x1="38" y1="142" x2="72" y2="142" stroke="rgba(255,255,255,0.25)" stroke-width="1.5"/>
+                        <text x="48" y="152" class="maniqui-texto">4m</text>
+
+                        <!-- Trayectoria en Zig-Zag -->
+                        <path d="M38 125 L72 55 L106 125 L140 55 L174 125 L198 90" stroke="#34C759" stroke-width="2.5" stroke-dasharray="4 2" fill="none"/>
+
+                        <!-- 5 Conos alternados + Meta -->
+                        <polygon points="33,130 38,114 43,130" fill="#00E5FF"/>
+                        <text x="32" y="110" class="maniqui-texto" fill="#00E5FF">C1</text>
+
+                        <polygon points="67,60 72,44 77,60" fill="#FF9F0A"/>
+                        <text x="66" y="40" class="maniqui-texto" fill="#FF9F0A">C2</text>
+
+                        <polygon points="101,130 106,114 111,130" fill="#FF9F0A"/>
+                        <text x="100" y="142" class="maniqui-texto" fill="#FF9F0A">C3</text>
+
+                        <polygon points="135,60 140,44 145,60" fill="#FF9F0A"/>
+                        <text x="134" y="40" class="maniqui-texto" fill="#FF9F0A">C4</text>
+
+                        <polygon points="169,130 174,114 179,130" fill="#FF9F0A"/>
+                        <text x="168" y="142" class="maniqui-texto" fill="#FF9F0A">C5</text>
+
+                        <circle cx="198" cy="90" r="5" fill="#34C759"/>
+                        <text x="180" y="78" class="maniqui-texto" fill="#34C759">20m</text>
+                    `, "5 CONOS ESCALONADOS • 4M LARGO × 3M ANCHO")
+                };
+            }
+
+            // --- CAMPO 2.3: SLALOM 4 CONOS (6M) + AUTOPASE 10M + PASE A PARED Y CONTROL ---
+            if (n.includes("slalom")) {
+                return {
+                    tempo: "Conducción Rápida + Explosión",
+                    musculo: "Coordinación con Pelota y Sprint Específico",
+                    postura: "ARMADO DE CONOS (Total 22m hacia la pared): A 22 metros de la pared coloca el Cono 1 de inicio. Pon los Conos 2, 3 y 4 en línea recta separados por 2m entre sí (ocupan 6m en total). A 10m del Cono 4 (y a 6m de la pared), coloca un 5° Cono como línea límite de pase.",
+                    agarre: "RECORRIDO: 1) Conduce en slalom corto entre los 4 primeros conos (6m). 2) Al salir del 4° cono, tira un autopase largo de 10m y esprinta a máxima velocidad para alcanzarlo en el 5° cono. 3) Antes del 5° cono, da un pase firme contra la pared y controla el rebote perfilado.",
+                    clave: "Simula sacarte una marca en corto en la banda (slalom), tirarla larga al espacio como lateral (autopase 10m) y tirar una pared o centro en velocidad.",
+                    svg: generarEscenaSVG(`
+                        <!-- Pared a la derecha -->
+                        <line x1="202" y1="30" x2="202" y2="145" stroke="#FF453A" stroke-width="5"/>
+                        <text x="168" y="25" class="maniqui-texto" fill="#FF453A">PARED</text>
+
+                        <!-- 4 Conos de Slalom (cada 2m = 6m) -->
+                        <polygon points="18,105 22,91 26,105" fill="#00E5FF"/>
+                        <polygon points="38,105 42,91 46,105" fill="#FF9F0A"/>
+                        <polygon points="58,105 62,91 66,105" fill="#FF9F0A"/>
+                        <polygon points="78,105 82,91 86,105" fill="#FF9F0A"/>
+                        <path d="M18 98 Q32 72 42 98 T62 98 T82 98" stroke="#00E5FF" stroke-width="2" fill="none"/>
+                        <text x="20" y="122" class="maniqui-texto" fill="#00E5FF">SLALOM (6m / 2m c/u)</text>
+
+                        <!-- Autopase 10m hasta Cono 5 -->
+                        <path d="M84 95 L152 95" stroke="#34C759" stroke-width="2.5" stroke-dasharray="4 2"/>
+                        <polygon points="150,105 154,91 158,105" fill="#34C759"/>
+                        <text x="92" y="84" class="maniqui-texto" fill="#34C759">AUTOPASE (10m)</text>
+
+                        <!-- Pase a pared (6m) y rebote -->
+                        <path d="M156 90 L198 78" stroke="#FF9F0A" stroke-width="2"/>
+                        <path d="M198 78 L162 64" stroke="#FF9F0A" stroke-width="2" stroke-dasharray="2 2"/>
+                        <circle cx="156" cy="90" r="4.5" fill="#FFF"/>
+                        <text x="148" y="122" class="maniqui-texto" fill="#FF9F0A">PASE (6m)</text>
+                    `, "4 CONOS CADA 2M + 10M AUTOPASE + 6M A PARED")
+                };
+            }
+
+            // --- CAMPO 2.4: AGILIDAD EN 'L' (5x5M) + GIRO 180° CON PELOTA Y PARED ---
+            if (n.includes("agilidad en 'l'")) {
+                return {
+                    tempo: "Tracción Curva y Giro Cerrado",
+                    musculo: "Giro 180°, Perfilación y Pase",
+                    postura: "ARMADO DE CONOS: Forma una 'L' con 3 conos a 6 metros de la pared. Coloca el Cono 1 (Salida) a 6m de la pared; el Cono 2 (Vértice central) a 5 metros en línea recta frente al Cono 1; y el Cono 3 a 5 metros a la derecha (o izquierda) del Cono 2 formando un ángulo de 90°. Deja la pelota lista junto al Cono 1 o pide rebote contra la pared.",
+                    agarre: "RECORRIDO (15m sin pelota + balón): 1) Esprinta 5m del Cono 1 al Cono 2. 2) Gira 90° por fuera del Cono 2 hacia el Cono 3 (5m), da la vuelta en 180° por detrás del Cono 3 y vuelve al Cono 2 y de ahí al Cono 1. 3) Al llegar al Cono 1, toca la pelota fuerte a la pared, controla el rebote girando 180° y acelera 5m hacia el Cono 2 con balón.",
+                    clave: "Realiza 2 repeticiones armando la 'L' hacia la derecha y 2 hacia la izquierda para entrenar ambos perfiles de giro.",
+                    svg: generarEscenaSVG(`
+                        <!-- Pared abajo -->
+                        <line x1="25" y1="148" x2="135" y2="148" stroke="#FF453A" stroke-width="4.5"/>
+                        <text x="60" y="142" class="maniqui-texto" fill="#FF453A">PARED (A 6m)</text>
+
+                        <!-- Cono 1 (Base de la L) -->
+                        <polygon points="64,114 70,98 76,114" fill="#00E5FF"/>
+                        <text x="32" y="112" class="maniqui-texto" fill="#00E5FF">C1 (0m)</text>
+
+                        <!-- Cono 2 (Vértice 90° a 5m) -->
+                        <polygon points="64,48 70,32 76,48" fill="#FF9F0A"/>
+                        <text x="28" y="44" class="maniqui-texto" fill="#FF9F0A">C2 (5m)</text>
+
+                        <!-- Cono 3 (Extremo lateral a 5m) -->
+                        <polygon points="154,48 160,32 166,48" fill="#FF9F0A"/>
+                        <text x="145" y="64" class="maniqui-texto" fill="#FF9F0A">C3 (5m)</text>
+
+                        <!-- Recorrido en L ida y vuelta -->
+                        <path d="M70 96 L70 38 L160 38" stroke="#34C759" stroke-width="2.5" fill="none"/>
+                        <path d="M160 44 L76 44 L76 96" stroke="#00E5FF" stroke-width="2" stroke-dasharray="3 2" fill="none"/>
+
+                        <!-- Rebote con pelota en pared -->
+                        <circle cx="82" cy="110" r="4.5" fill="#FFF"/>
+                        <path d="M82 114 L82 144" stroke="#FF9F0A" stroke-width="2"/>
+                    `, "3 CONOS EN 'L' (5M × 5M) A 6M DE LA PARED")
                 };
             }
 
@@ -3264,6 +3393,7 @@
             document.getElementById('uiGuiaTempo').innerText = guia.tempo;
             document.getElementById('uiGuiaMusculo').innerText = guia.musculo;
             document.getElementById('uiGuiaPostura').innerText = guia.postura;
+            document.getElementById('lblTituloPosturaGuia').innerText = guia.postura.startsWith("ARMADO DE CONOS") ? "📍 Armado de Conos y Posición Inicial" : "📐 Postura y Posición Inicial";
             document.getElementById('uiGuiaAgarre').innerText = guia.agarre;
             document.getElementById('uiGuiaClave').innerText = guia.clave;
 
